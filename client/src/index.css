@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: #f1f7f8;
+  background: #07191f;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --ink: #f1f7f8;
+  --muted: #a9bdc3;
+  --gold: #efb441;
+  --gold-light: #f8d77d;
+  --teal: #17a4a8;
+  --line: rgba(226, 242, 245, .15);
+  --glass: rgba(14, 43, 52, .78);
+  --shadow: 0 20px 55px rgba(0, 0, 0, .23);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: radial-gradient(ellipse at 2% 2%, rgba(18, 166, 168, .18), transparent 34rem), radial-gradient(ellipse at 98% 20%, rgba(230, 166, 44, .12), transparent 32rem), #07191f; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--gold-light); outline-offset: 3px; }
+button:disabled { cursor: not-allowed; opacity: .64; }
+a { color: inherit; }
+::selection { color: #201700; background: var(--gold-light); }

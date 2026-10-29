@@ -1,0 +1,12 @@
+node_modules/
+client/dist/
+backend/target/
+backend/data/
+.env
+.env.local
+client/.env.local
+android/.gradle/
+android/local.properties
+android/.idea/
+*.jks
+*.keystore

@@ -1,0 +1,1187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kaam Connect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Design: dark-first glassmorphism. Frosted panels float over a soft teal, gold and indigo glow.
+   Gold is the single action colour, teal is the secondary, green is for calling. Large touch targets stay for low-literacy use. */
+:root{
+  --bg1:#06141A; --bg2:#0A2530; --b1:#12A6A8; --b2:#E9B24A; --b3:#4C6FFF; --blobo:.5;
+  --glass:rgba(255,255,255,.075); --glass2:rgba(255,255,255,.13); --edge:rgba(255,255,255,.17); --line:rgba(255,255,255,.22);
+  --ink:#F1F7F8; --mute:#A8BEC5;
+  --gold1:#F8DA7C; --gold2:#E6A62C; --gold-ink:#2A1D00;
+  --teal1:#15A0A6; --teal2:#0B6B74; --ok1:#3EE0A6; --ok2:#12A874; --ok-ink:#032619; --danger:#FF6B5E;
+  --shadow:0 12px 32px rgba(0,0,0,.35); --hl:inset 0 1px 0 rgba(255,255,255,.18);
+  --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI","Noto Sans","Noto Sans Devanagari","Noto Sans Telugu","Noto Sans Tamil","Noto Sans Kannada","Noto Sans Bengali",sans-serif;
+  --glow:rgba(230,166,44,.35); --gtext:var(--gold1);
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){
+  :root{--bg1:#EEF6F7; --bg2:#D6E8EC; --b1:#6CD3D5; --b2:#F6D58A; --b3:#9DB4FF; --blobo:.75;
+    --glass:rgba(255,255,255,.6); --glass2:rgba(255,255,255,.8); --edge:rgba(255,255,255,.95); --line:rgba(16,37,44,.2);
+    --ink:#10252C; --mute:#4A6068; --danger:#C62828;
+    --shadow:0 12px 32px rgba(24,60,72,.15); --hl:inset 0 1px 0 rgba(255,255,255,.95); --gtext:#9A6500; color-scheme:light}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:linear-gradient(160deg,var(--bg1),var(--bg2));background-attachment:fixed;color:var(--ink);font-family:var(--font);
+  font-size:18px;line-height:1.45;padding-bottom:120px;min-height:100vh;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--gold1);outline-offset:2px}
+.i{width:1.2em;height:1.2em;flex:0 0 auto;vertical-align:-.2em}
+
+/* ambient glow behind the glass */
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.bg i{position:absolute;border-radius:50%;filter:blur(80px);opacity:var(--blobo)}
+.bg i:nth-child(1){width:340px;height:340px;background:var(--b1);top:-90px;left:-110px}
+.bg i:nth-child(2){width:300px;height:300px;background:var(--b2);top:36%;right:-120px;opacity:calc(var(--blobo) * .7)}
+.bg i:nth-child(3){width:380px;height:380px;background:var(--b3);bottom:-140px;left:10%;opacity:calc(var(--blobo) * .6)}
+@media (prefers-reduced-motion:no-preference){.bg i{animation:drift 22s ease-in-out infinite alternate}.bg i:nth-child(2){animation-duration:28s}.bg i:nth-child(3){animation-duration:34s}}
+@keyframes drift{to{transform:translate3d(40px,30px,0)}}
+
+/* glass surface, shared */
+.glass,header.top,.card,.tile,.cat,.rule,.check,.msg.bot .mb,.note,.chip,.seg button,.yn span,.searchbar input,form input[type=text],form input[type=number],form select,nav.tabs .wrap,.sheet,.pill{
+  background:var(--glass);border:1px solid var(--edge);box-shadow:var(--hl),var(--shadow);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .glass,header.top,.card,.tile,.cat,.rule,.check,.msg.bot .mb,.note,.chip,.seg button,.yn span,.searchbar input,form input[type=text],form input[type=number],form select,nav.tabs .wrap,.sheet,.pill{background:var(--bg2)}
+}
+
+.wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:0;z-index:5;border-width:0 0 1px 0;border-radius:0;box-shadow:var(--hl)}
+header.top .wrap{display:flex;align-items:center;gap:6px;min-height:64px;flex-wrap:nowrap;padding-block:8px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15.5px;letter-spacing:-.02em;flex:1;min-width:0;gap:8px}
+.logo>span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logo .mark{flex:0 0 auto}
+@media (max-width:370px){.logo>span:last-child{display:none}}
+.logo b{font-weight:800;color:var(--gold1);margin-left:2px}
+.logo .mark{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--gold1),var(--gold2));color:var(--gold-ink);display:grid;place-items:center;font-weight:800;font-size:20px;box-shadow:0 6px 16px var(--glow)}
+.logo .mark::after{content:"K"}
+select#lang{min-height:46px;border-radius:14px;padding:0 6px;max-width:94px;font-size:16px;font-weight:600;border:1px solid var(--line);background:var(--glass2);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.hbtn{position:relative;flex:0 0 auto;min-width:44px;min-height:46px;border-radius:14px;border:1px solid var(--line);background:var(--glass2);color:var(--ink);display:grid;place-items:center}
+.hbtn .i{width:23px;height:23px}
+[hidden]{display:none!important}
+.badge-n{position:absolute;top:-6px;right:-6px;background:linear-gradient(135deg,var(--gold1),var(--gold2));color:var(--gold-ink);font-size:12px;font-weight:800;border-radius:99px;min-width:22px;height:22px;display:grid;place-items:center;padding:0 5px}
+
+main{padding-block:20px}
+h1.hello{font-size:28px;line-height:1.2;letter-spacing:-.02em;margin:4px 0 14px;font-weight:800;text-wrap:balance}
+h2{font-size:13px;margin:26px 0 12px;color:var(--mute);text-transform:uppercase;letter-spacing:.12em;font-weight:700}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:6px 14px;font-size:14px;font-weight:600;color:var(--mute)}
+.pill .i{color:var(--gold1)}
+
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tile{min-height:156px;border-radius:24px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:14px;font-weight:800;font-size:19px;text-align:left;padding:18px;line-height:1.2;position:relative;overflow:hidden;color:var(--ink)}
+.tile .ic{width:60px;height:60px;border-radius:18px;display:grid;place-items:center;background:var(--glass2);border:1px solid var(--edge);color:var(--gold1)}
+.tile .ic .i{width:30px;height:30px}
+.tile.t1{background:linear-gradient(145deg,var(--gold1),var(--gold2));color:var(--gold-ink);border-color:rgba(255,255,255,.4)}
+.tile.t1 .ic{background:rgba(42,29,0,.14);border-color:rgba(42,29,0,.18);color:var(--gold-ink)}
+.tile.t2{background:linear-gradient(145deg,rgba(21,160,166,.85),color-mix(in srgb,var(--teal2) 45%,transparent));color:#fff;border-color:rgba(255,255,255,.3)}
+.tile.t2 .ic{color:#fff;background:rgba(255,255,255,.18)}
+
+.catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:12px}
+.cat{min-height:98px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:700;padding:8px;overflow-wrap:anywhere;text-align:center}
+.cat span{font-size:30px;line-height:1}
+
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;padding:5px;border-radius:20px;background:var(--glass);border:1px solid var(--edge)}
+.seg button{min-height:52px;border-radius:15px;font-weight:700;border-color:transparent;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--mute)}
+.seg button.on{background:linear-gradient(145deg,var(--gold1),var(--gold2));color:var(--gold-ink);box-shadow:0 6px 16px var(--glow)}
+
+.searchbar{display:flex;gap:10px}
+.searchbar input{flex:1;min-width:0;min-height:58px;border-radius:18px;padding:0 18px;font-size:18px}
+.searchbar input::placeholder,form input::placeholder{color:var(--mute);opacity:.85}
+.mic{width:58px;min-height:58px;border-radius:18px;border:0;background:linear-gradient(145deg,var(--gold1),var(--gold2));color:var(--gold-ink);display:grid;place-items:center;box-shadow:0 8px 20px var(--glow)}
+.mic .i{width:26px;height:26px}
+.mic.on{background:linear-gradient(145deg,#FF8A7E,var(--danger));color:#fff;animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.07)}}
+@media (prefers-reduced-motion:reduce){.mic.on{animation:none}}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:14px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;min-height:44px;border-radius:99px;padding:0 16px;font-weight:600;font-size:16px;white-space:nowrap;box-shadow:var(--hl)}
+.chip.on{background:linear-gradient(145deg,var(--gold1),var(--gold2));color:var(--gold-ink);border-color:transparent}
+
+.card{display:grid;grid-template-columns:60px 1fr;gap:4px 14px;border-radius:24px;padding:16px;margin-bottom:14px}
+.card .av{font-size:32px;width:60px;height:60px;border-radius:18px;background:var(--glass2);border:1px solid var(--edge);display:grid;place-items:center}
+.card .grow{min-width:0}
+.card h3{margin:0;font-size:19px;line-height:1.25;overflow-wrap:anywhere;font-weight:700;letter-spacing:-.01em}
+.sub{margin:3px 0 0;color:var(--mute);font-size:15px}
+.sub .i{width:1em;height:1em;vertical-align:-.12em}
+.star{color:var(--gold1)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--ok1);border:1px solid color-mix(in srgb,var(--ok1) 55%,transparent);background:color-mix(in srgb,var(--ok1) 12%,transparent);border-radius:99px;padding:1px 8px;margin-left:4px;vertical-align:middle}
+.badge .i{width:13px;height:13px}
+@media (prefers-color-scheme:light){.badge{color:#0A7A52}}
+.actions{grid-column:1 / -1;display:flex;gap:10px;margin-top:10px}
+.btn{min-height:58px;border:0;border-radius:18px;font-weight:800;font-size:17px;padding:0 18px;flex:1;display:inline-flex;align-items:center;justify-content:center;gap:10px;color:#fff;
+  background:linear-gradient(145deg,var(--teal1),var(--teal2));box-shadow:0 8px 20px color-mix(in srgb,var(--teal2) 45%,transparent),inset 0 1px 0 rgba(255,255,255,.28)}
+.btn .i{width:22px;height:22px}
+.btn.call{background:linear-gradient(145deg,var(--ok1),var(--ok2));color:var(--ok-ink);box-shadow:0 8px 20px rgba(18,168,116,.35),inset 0 1px 0 rgba(255,255,255,.4)}
+.btn.hi{background:linear-gradient(145deg,var(--gold1),var(--gold2));color:var(--gold-ink);box-shadow:0 8px 20px var(--glow),inset 0 1px 0 rgba(255,255,255,.5)}
+.btn.alt{flex:0 0 58px;padding:0;background:var(--glass2);color:var(--ink);border:1px solid var(--line);box-shadow:var(--hl)}
+.btn.ghost{background:var(--glass);color:var(--ink);border:1px solid var(--line);box-shadow:var(--hl)}
+.btn[disabled]{opacity:.55;cursor:default}
+.pay{font-size:26px;font-weight:800;margin:6px 0 2px;letter-spacing:-.02em;color:var(--gold1)}
+.pay .sub{display:inline;font-weight:600;letter-spacing:0}
+@media (prefers-color-scheme:light){.pay{color:var(--gtext)}}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font-size:13px;font-weight:600;background:var(--glass2);border:1px solid var(--edge);border-radius:99px;padding:3px 10px}
+
+form .f{margin-bottom:18px}
+form label.l{display:block;font-weight:700;font-size:15px;color:var(--mute);margin-bottom:8px}
+form input[type=text],form input[type=number],form select{width:100%;min-height:58px;border-radius:18px;padding:0 18px;font-size:18px}
+form input:focus,form select:focus,.searchbar input:focus{border-color:var(--gold1);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--gold1) 35%,transparent)}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.yn label{position:relative}
+.yn input{position:absolute;opacity:0;inset:0}
+.yn span{display:grid;place-items:center;min-height:58px;border-radius:18px;font-weight:700}
+.yn input:checked+span{background:linear-gradient(145deg,var(--gold1),var(--gold2));color:var(--gold-ink);border-color:transparent}
+.yn input:focus-visible+span{outline:3px solid var(--gold1);outline-offset:2px}
+.check{display:flex;gap:14px;align-items:flex-start;padding:16px;border-radius:20px}
+.check input{width:26px;height:26px;flex:0 0 auto;margin-top:2px;accent-color:#E6A62C}
+.check a{color:var(--gold1);font-weight:700}
+@media (prefers-color-scheme:light){.check a{color:var(--gtext)}}
+.rule{display:grid;grid-template-columns:48px 1fr;gap:14px;align-items:center;border-radius:20px;padding:16px;margin-bottom:12px}
+.rule .ic{font-size:28px;width:48px;height:48px;border-radius:15px;background:var(--glass2);border:1px solid var(--edge);display:grid;place-items:center;color:var(--gold1)}
+.rule .ic .i{width:24px;height:24px}
+
+.chathead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.botav{width:48px;height:48px;border-radius:50%;background:linear-gradient(145deg,var(--gold1),var(--gold2));color:var(--gold-ink);display:grid;place-items:center;flex:0 0 auto;box-shadow:0 6px 16px var(--glow)}
+.botav .i{width:24px;height:24px}
+.botav.sm{width:34px;height:34px}
+.botav.sm .i{width:18px;height:18px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ok1);margin-right:6px;box-shadow:0 0 0 3px color-mix(in srgb,var(--ok1) 25%,transparent)}
+.chat{display:flex;flex-direction:column;gap:12px;margin-bottom:8px;min-height:200px}
+.msg{max-width:88%;overflow-wrap:anywhere}
+.msg.me{align-self:flex-end;padding:12px 16px;border-radius:20px 20px 6px 20px;background:linear-gradient(145deg,var(--teal1),var(--teal2));color:#fff;box-shadow:0 8px 20px color-mix(in srgb,var(--teal2) 45%,transparent)}
+.msg.bot{display:flex;gap:10px;align-items:flex-start;max-width:94%}
+.msg.bot .mb{border-radius:6px 20px 20px 20px;padding:14px 16px;min-width:0;overflow-wrap:anywhere}
+.mb .btn{margin-top:10px;min-height:50px;width:100%;flex:none;font-size:16px}
+.say{display:flex;align-items:center;margin-top:8px;border:0;background:none;color:var(--mute);padding:4px 0}
+.say .i{width:22px;height:22px}
+.typing{display:flex;gap:6px;padding:18px 18px}
+.typing i{width:8px;height:8px;border-radius:50%;background:var(--mute);animation:bl 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}
+.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bl{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.typing i{animation:none}}
+.row{display:flex;gap:10px;margin-top:14px}
+.note{padding:14px;border-radius:16px;color:var(--mute);font-size:14px;margin-top:12px;box-shadow:none}
+.empty{text-align:center;color:var(--mute);padding:36px 0}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));pointer-events:none}
+nav.tabs .wrap{pointer-events:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:6px;border-radius:28px;max-width:600px;margin-left:auto;margin-right:auto;width:calc(100% - 32px);padding-left:6px;padding-right:6px}
+nav.tabs button{border:0;background:none;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11.5px;font-weight:700;color:var(--mute);border-radius:22px;overflow-wrap:anywhere;line-height:1.15;padding:4px 2px}
+nav.tabs button span{display:grid;place-items:center}
+nav.tabs button .i{width:25px;height:25px}
+nav.tabs button.on{color:var(--gold-ink);background:linear-gradient(145deg,var(--gold1),var(--gold2));box-shadow:0 6px 16px var(--glow)}
+
+.overlay{position:fixed;inset:0;z-index:20;background:rgba(3,10,14,.6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:grid;place-items:center;padding:16px}
+.sheet{width:100%;max-width:420px;border-radius:32px;padding:26px 22px;text-align:center;background:var(--glass2)}
+.sheet .big{width:96px;height:96px;margin:0 auto 8px;border-radius:50%;display:grid;place-items:center;font-size:48px;background:var(--glass);border:1px solid var(--edge)}
+.sheet h3{margin:6px 0;font-size:22px}
+.timer{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;margin:6px 0}
+@media (prefers-color-scheme:light){.logo b,.tile .ic,.pill .i,.rule .ic{color:var(--gtext)}.star{color:#B87800}}
+#toast{position:fixed;left:50%;bottom:118px;transform:translateX(-50%);background:rgba(8,20,26,.88);color:#F1F7F8;padding:12px 18px;border-radius:16px;z-index:30;max-width:90%;text-align:center;border:1px solid rgba(255,255,255,.18);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);font-weight:600}
+
+/* landing, auth, role screens */
+@media (max-width:460px){#hdr.in .logo>span:last-child{display:none}}
+.hbtn.av{font-weight:800;font-size:18px;border:0;background:linear-gradient(145deg,var(--gold1),var(--gold2));color:var(--gold-ink)}
+.hbtn.txt{padding:0 18px;font-weight:800;font-size:16px;border:0;background:linear-gradient(145deg,var(--gold1),var(--gold2));color:var(--gold-ink)}
+.hero{padding:8px 0 0}
+.hero h1{font-size:clamp(34px,9.5vw,50px);line-height:1.06;letter-spacing:-.035em;margin:6px 0 14px;font-weight:800;text-wrap:balance}
+.hero p{color:var(--mute);font-size:18px;margin:0 0 22px;max-width:34em}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.cta .btn{flex:1 1 150px}
+.roles{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:560px){.roles{grid-template-columns:1fr 1fr}}
+.rolecard{border-radius:26px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.rolecard h3{margin:0;font-size:21px;letter-spacing:-.01em}
+.rolecard .ic{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;background:var(--glass2);border:1px solid var(--edge);color:var(--gold1)}
+.rolecard .ic .i{width:28px;height:28px}
+.rolecard ul{list-style:none;margin:0;padding:0;display:grid;gap:10px;color:var(--mute);font-size:16px;flex:1}
+.rolecard li{display:flex;gap:10px;align-items:flex-start}
+.rolecard li .i{color:var(--ok1);margin-top:2px}
+.rule .ic{font-weight:800;font-size:22px}
+.tile small{font-weight:600;font-size:15px;opacity:.85}
+.phonef{display:flex;gap:10px}
+.phonef .cc{display:grid;place-items:center;padding:0 16px;border-radius:18px;font-weight:800;min-height:58px}
+.phonef input[type=text]{width:auto;flex:1;min-width:0}
+form input[type=text].otp{text-align:center;font-size:32px;font-weight:800;letter-spacing:.45em;padding:0 0 0 .45em;min-height:68px}
+.st{display:inline-flex;align-items:center;padding:1px 10px;border-radius:99px;font-size:13px;font-weight:700;border:1px solid var(--line);vertical-align:middle}
+.st.ok{color:var(--ok1);border-color:color-mix(in srgb,var(--ok1) 55%,transparent);background:color-mix(in srgb,var(--ok1) 12%,transparent)}
+.st.no{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 55%,transparent)}
+.st.wait{color:var(--gold1);border-color:color-mix(in srgb,var(--gold1) 55%,transparent)}
+@media (prefers-color-scheme:light){.st.ok{color:#0A7A52}.st.wait{color:var(--gtext)}.rolecard .ic{color:var(--gtext)}.rolecard li .i{color:#0A7A52}}
+.appl{grid-column:1 / -1;display:grid;gap:4px;margin-top:6px;padding-top:12px;border-top:1px solid var(--line)}
+.arow{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;padding:10px 0}
+.arow+.arow{border-top:1px solid var(--line)}
+.arow .head{display:flex;gap:12px;align-items:center;flex:1 1 100%;min-width:0}
+.arow .who{min-width:0;overflow-wrap:anywhere}
+.av2{width:44px;height:44px;border-radius:14px;background:var(--glass2);border:1px solid var(--edge);display:grid;place-items:center;font-size:24px;flex:0 0 auto}
+.arow .btn{min-height:48px;font-size:15px;padding:0 12px}
+.arow .btn.call{flex:0 0 52px;padding:0}
+.appl-card{display:block;padding:6px 16px}
+
+/* role themes: workers get warm gold and teal, employers get cool cyan and indigo */
+html[data-role=employer]{--gold1:#8DEAF0;--gold2:#14A7BF;--gold-ink:#03242B;--teal1:#5568F0;--teal2:#3340C8;--b1:#4C6FFF;--b2:#14A7BF;--b3:#8B5CF6;--glow:rgba(20,167,191,.38)}
+@media (prefers-color-scheme:light){html[data-role=employer]{--gtext:#0B6E80;--b1:#9DB4FF;--b2:#7FE0EA;--b3:#C3B0FF}}
+html[data-role] header.top{border-bottom-color:color-mix(in srgb,var(--gold1) 55%,transparent)}
+/* worker home */
+.voicehero{border-radius:28px;padding:20px;display:grid;grid-template-columns:minmax(0,1fr);gap:14px;justify-items:center;text-align:center;margin-bottom:6px}
+.voicehero p{margin:0;font-size:20px;font-weight:800;letter-spacing:-.01em}
+.bigmic{width:92px;height:92px;border-radius:50%;border:0;display:grid;place-items:center;background:linear-gradient(145deg,var(--gold1),var(--gold2));color:var(--gold-ink);box-shadow:0 12px 30px var(--glow),0 0 0 10px color-mix(in srgb,var(--gold1) 18%,transparent)}
+.bigmic .i{width:42px;height:42px}
+.bigmic.on{background:linear-gradient(145deg,#FF8A7E,var(--danger));color:#fff;animation:pulse 1s infinite}
+@media (prefers-reduced-motion:reduce){.bigmic.on{animation:none}}
+.voicehero .searchbar{width:100%;min-width:0}
+/* employer home */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:4px;text-align:left;color:var(--ink)}
+.stat b{font-size:38px;line-height:1;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stat span{color:var(--mute);font-size:14px;font-weight:600}
+.stat.alert{border-color:var(--gold1);box-shadow:var(--hl),0 0 0 2px color-mix(in srgb,var(--gold1) 40%,transparent),var(--shadow)}
+.stat.alert b{color:var(--gtext)}
+.joblist{border-radius:22px;padding:4px 14px}
+.jrow{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;padding:12px 0;text-align:left;color:var(--ink)}
+.jrow+.jrow{border-top:1px solid var(--line)}
+.jrow .jt{flex:1;min-width:0;display:flex;flex-direction:column}
+.jrow .jt b{overflow-wrap:anywhere}
+.hscroll{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 14px;scroll-snap-type:x proximity;scrollbar-width:none}
+.hscroll::-webkit-scrollbar{display:none}
+.mini{flex:0 0 240px;scroll-snap-align:start;border-radius:22px;padding:14px;display:grid;gap:12px}
+.mini .head{display:flex;gap:10px;align-items:center;min-width:0}
+.mini .who{min-width:0;overflow-wrap:anywhere}
+.mini .btn{min-height:48px;font-size:15px}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+<header class="top"><div class="wrap" id="hdr"></div></header>
+<main class="wrap" id="app"></main>
+<nav class="tabs"><div class="wrap" id="tabs"></div></nav>
+<div id="layer"></div>
+<div id="toast" hidden></div>
+
+<script>
+/* ============================================================
+   Kaam Connect: prototype. Everything runs in the browser.
+   To add a language: add an entry to LANGS, one object to S,
+   and a name per category in CATS. Missing text falls back to English.
+   ============================================================ */
+const LANGS={
+  en:{n:'English',sr:'en-IN'}, hi:{n:'हिन्दी',sr:'hi-IN'}, te:{n:'తెలుగు',sr:'te-IN'},
+  ta:{n:'தமிழ்',sr:'ta-IN'}, kn:{n:'ಕನ್ನಡ',sr:'kn-IN'}, bn:{n:'বাংলা',sr:'bn-IN'}, mr:{n:'मराठी',sr:'mr-IN'}
+};
+
+const S={
+en:{tag:'Work near you, today',find_work:'Find work',find_worker:'Find a worker',post_job:'Post a job',assistant:'Helper',
+ search_ph:'Search: plumber, cook, driver…',tap_speak:'Tap and speak',listening:'Listening…',no_voice:'Voice search is not supported in this browser. Try Chrome.',
+ mic_denied:'Microphone is not allowed',nearby:'Nearby',away:'km away',call_app:'Call in app',apply:'Apply',applied:'Applied ✓',per_day:'per day',
+ verified:'Verified',job_name:'Job name',category:'Work type',job_type:'Job duration',daily:'Daily',weekly:'Weekly',contract:'Contract',
+ need:'Workers needed',pay:'Pay (₹ per day)',vehicle:'Vehicle provided',drinks:'Tea / water / drinks provided',yes:'Yes',no:'No',
+ driver_v:'Driver is verified (licence checked)',place:'Place',agree:'I agree to the labour rules',submit:'Post job',home:'Home',jobs:'Jobs',
+ alerts:'Alerts',rules:'Labour rules',t1:'No child labour. Every worker must be 18 or older.',
+ t2:'Only legal workers. No forced work and no unpaid work.',t3:'If a vehicle is given, the driver must be verified with a valid licence.',
+ t4:'Pay must be told before work starts and paid on time.',age18:'I am 18 or older and allowed to work',confirm:'Confirm',cancel:'Cancel',
+ calling:'Calling…',connected:'Connected',end:'End call',hidden:'Your personal number stays hidden. The call goes through the app.',
+ demo:'Demo call: real calling needs a phone service',no_results:'Nothing found nearby',posted:'Job posted. Nearby workers were told.',
+ read:'Read aloud',all:'All',ask_ph:'Ask the helper…',send:'Send',err_fill:'Please fill job name, place and pay',
+ err_agree:'Please agree to the labour rules',err_driver:'A vehicle needs a verified driver',empty_alerts:'No alerts yet',enable_push:'Turn on phone alerts',
+ applied_for:'You applied for',new_job:'New job near you',veh_yes:'Vehicle',drink_yes:'Drinks',
+ as_hello:'Hello! I can help you find work, apply, and understand the rules.',
+ as_found:'Found {n} results for {c}. Tap the button below.',
+ as_apply:'To apply: open Jobs, pick a job, tap Apply, and confirm you are 18 or older.',
+ as_greet:'Hi there! 👋 I am Kaam Mitra, your work helper. Tell me what work you want, like plumber or cook, and I will find it near you.',
+ as_thanks:'You are welcome! 😊 Anything else I can help with?',
+ as_post:'To post a job: tap Post a job, fill the job name, pay and place, say if you give a vehicle or drinks, then agree to the labour rules.',
+ as_call:'To call a worker: search the work, like plumber, then tap the green Call in app button. Your number stays hidden.',
+ as_pay:'Jobs for {c} pay about ₹{p} per day nearby.',
+ as_pay_ask:'Tell me which work, like cook or driver, and I will tell you the usual pay.',
+ as_alerts:'You will get an alert when you apply or when a new job is posted. Tap the bell at the top to see them.',
+ as_default:'Sorry, I did not get that. 🙂 Tell me a work like plumber or cook, or tap one of the buttons below.',
+ ch_apply:'How to apply',ch_call:'Call a worker',ch_pay:'Usual pay'},
+hi:{tag:'आज, आपके पास काम',find_work:'काम खोजें',find_worker:'कारीगर खोजें',post_job:'काम डालें',assistant:'सहायक',
+ search_ph:'खोजें: प्लंबर, रसोइया, ड्राइवर…',tap_speak:'दबाएँ और बोलें',listening:'सुन रहा हूँ…',nearby:'पास में',away:'किमी दूर',call_app:'ऐप में कॉल करें',
+ apply:'आवेदन करें',applied:'आवेदन हो गया ✓',per_day:'प्रति दिन',verified:'सत्यापित',job_name:'काम का नाम',category:'काम का प्रकार',job_type:'काम की अवधि',
+ daily:'रोज़',weekly:'साप्ताहिक',contract:'ठेका',need:'कितने लोग चाहिए',pay:'मजदूरी (₹ प्रति दिन)',vehicle:'गाड़ी मिलेगी',drinks:'चाय / पानी / पेय मिलेगा',
+ yes:'हाँ',no:'नहीं',driver_v:'ड्राइवर सत्यापित है (लाइसेंस जाँचा गया)',place:'जगह',agree:'मैं श्रम नियमों से सहमत हूँ',submit:'काम डालें',home:'होम',jobs:'काम',
+ alerts:'सूचना',rules:'श्रम नियम',t1:'बाल मज़दूरी नहीं। हर कामगार की उम्र 18 साल या अधिक होनी चाहिए।',
+ t2:'केवल कानूनी रूप से काम करने वाले लोग। जबरन या बिना मजदूरी का काम नहीं।',t3:'अगर गाड़ी दी जाती है तो ड्राइवर सत्यापित और वैध लाइसेंस वाला होना चाहिए।',
+ t4:'मजदूरी काम शुरू होने से पहले बताई जाए और समय पर दी जाए।',age18:'मेरी उम्र 18 साल या अधिक है और मैं काम करने के लिए पात्र हूँ',confirm:'पक्का करें',cancel:'रद्द करें',
+ calling:'कॉल लग रही है…',end:'कॉल खत्म करें',hidden:'आपका निजी नंबर छिपा रहता है। कॉल ऐप से होती है।',no_results:'पास में कुछ नहीं मिला',
+ posted:'काम डाल दिया गया। पास के कामगारों को बताया गया।',all:'सभी',ask_ph:'सहायक से पूछें…',send:'भेजें',
+ as_hello:'नमस्ते! मैं काम खोजने, आवेदन करने और नियम समझाने में मदद कर सकता हूँ।',as_found:'{c} के लिए {n} परिणाम मिले। नीचे बटन दबाएँ।',
+ as_apply:'आवेदन के लिए: "काम" खोलें, काम चुनें, "आवेदन करें" दबाएँ और 18+ की पुष्टि करें।',as_greet:'नमस्ते! 👋 मैं काम मित्र हूँ। बताइए कौन सा काम चाहिए, जैसे प्लंबर या रसोइया, मैं पास में ढूँढ दूँगा।',
+ as_thanks:'कोई बात नहीं! 😊 और कुछ मदद चाहिए?',
+ as_post:'काम डालने के लिए: "काम डालें" दबाएँ, काम का नाम, मजदूरी और जगह भरें, गाड़ी या चाय मिलेगी या नहीं बताएँ, फिर श्रम नियमों से सहमत हों।',
+ as_call:'कारीगर को कॉल करने के लिए: काम खोजें, जैसे प्लंबर, फिर हरा "ऐप में कॉल करें" बटन दबाएँ। आपका नंबर छिपा रहेगा।',
+ as_pay:'{c} के काम में पास में लगभग ₹{p} प्रति दिन मिलता है।',
+ as_pay_ask:'बताइए कौन सा काम, जैसे रसोइया या ड्राइवर, मैं सामान्य मजदूरी बताऊँगा।',
+ as_alerts:'आवेदन करने पर या नया काम आने पर आपको सूचना मिलेगी। ऊपर घंटी दबाकर देखें।',
+ as_default:'माफ़ कीजिए, समझ नहीं आया। 🙂 कोई काम बताइए, जैसे प्लंबर या रसोइया, या नीचे का बटन दबाएँ।',
+ ch_apply:'आवेदन कैसे करें',ch_call:'कारीगर को कॉल',ch_pay:'सामान्य मजदूरी'},
+te:{tag:'ఈరోజు, మీ దగ్గరే పని',find_work:'పని వెతకండి',find_worker:'పనివారిని వెతకండి',post_job:'పని పోస్ట్ చేయండి',assistant:'సహాయకుడు',
+ search_ph:'వెతకండి: ప్లంబర్, వంటవాడు, డ్రైవర్…',tap_speak:'నొక్కి మాట్లాడండి',listening:'వింటున్నాను…',nearby:'దగ్గరలో',away:'కి.మీ దూరం',call_app:'యాప్‌లో కాల్ చేయండి',
+ apply:'దరఖాస్తు చేయండి',applied:'దరఖాస్తు చేశారు ✓',per_day:'రోజుకు',verified:'ధృవీకరించబడింది',job_name:'పని పేరు',category:'పని రకం',job_type:'పని కాలం',
+ daily:'రోజువారీ',weekly:'వారానికి',contract:'కాంట్రాక్ట్',need:'ఎంత మంది కావాలి',pay:'వేతనం (₹ రోజుకు)',vehicle:'వాహనం ఇస్తారు',drinks:'టీ / నీళ్లు / పానీయాలు ఇస్తారు',
+ yes:'అవును',no:'కాదు',driver_v:'డ్రైవర్ ధృవీకరించబడ్డారు (లైసెన్స్ తనిఖీ)',place:'ప్రదేశం',agree:'నేను కార్మిక నియమాలకు అంగీకరిస్తున్నాను',submit:'పని పోస్ట్ చేయండి',home:'హోమ్',jobs:'పనులు',
+ alerts:'సమాచారం',rules:'కార్మిక నియమాలు',t1:'బాల కార్మికులు వద్దు. ప్రతి కార్మికుడికి 18 ఏళ్లు నిండాలి.',
+ t2:'చట్టబద్ధంగా పని చేయగలవారే. బలవంతపు లేదా జీతం లేని పని వద్దు.',t3:'వాహనం ఇస్తే డ్రైవర్ చెల్లుబాటు అయ్యే లైసెన్స్‌తో ధృవీకరించబడాలి.',
+ t4:'పని మొదలయ్యే ముందే వేతనం చెప్పాలి, సమయానికి చెల్లించాలి.',age18:'నాకు 18 ఏళ్లు నిండాయి, పని చేయడానికి అర్హుడిని',confirm:'నిర్ధారించండి',cancel:'రద్దు',
+ calling:'కాల్ అవుతోంది…',end:'కాల్ ముగించండి',hidden:'మీ వ్యక్తిగత నంబర్ దాచబడుతుంది. కాల్ యాప్ ద్వారా వెళ్తుంది.',no_results:'దగ్గరలో ఏమీ దొరకలేదు',
+ posted:'పని పోస్ట్ అయింది. దగ్గరలోని వారికి తెలియజేశాం.',all:'అన్నీ',ask_ph:'సహాయకుడిని అడగండి…',send:'పంపండి',
+ as_hello:'నమస్తే! పని వెతకడం, దరఖాస్తు చేయడం, నియమాలు చెప్పడంలో సహాయం చేస్తాను.',as_found:'{c} కోసం {n} ఫలితాలు దొరికాయి. కింది బటన్ నొక్కండి.',
+ as_apply:'దరఖాస్తుకు: "పనులు" తెరవండి, పని ఎంచుకోండి, "దరఖాస్తు చేయండి" నొక్కి 18+ నిర్ధారించండి.',as_greet:'నమస్తే! 👋 నేను కామ్ మిత్ర. మీకు ఏ పని కావాలో చెప్పండి, ప్లంబర్ లేదా వంటవాడు లాంటివి, దగ్గరలో వెతికి చూపిస్తాను.',
+ as_thanks:'పర్వాలేదు! 😊 ఇంకేమైనా సహాయం కావాలా?',
+ as_post:'పని పోస్ట్ చేయడానికి: "పని పోస్ట్ చేయండి" నొక్కి, పని పేరు, వేతనం, ప్రదేశం నింపండి, వాహనం లేదా టీ ఇస్తారో చెప్పండి, కార్మిక నియమాలకు అంగీకరించండి.',
+ as_call:'పనివారికి కాల్ చేయడానికి: పని వెతకండి, ఉదా. ప్లంబర్, తర్వాత ఆకుపచ్చ "యాప్‌లో కాల్ చేయండి" నొక్కండి. మీ నంబర్ దాచబడుతుంది.',
+ as_pay:'{c} పనులకు దగ్గరలో రోజుకు సుమారు ₹{p} ఇస్తున్నారు.',
+ as_pay_ask:'ఏ పనో చెప్పండి, వంటవాడు లేదా డ్రైవర్ లాంటిది, సాధారణ వేతనం చెబుతాను.',
+ as_alerts:'దరఖాస్తు చేసినప్పుడు లేదా కొత్త పని వచ్చినప్పుడు సమాచారం వస్తుంది. పైన గంట నొక్కి చూడండి.',
+ as_default:'క్షమించండి, అర్థం కాలేదు. 🙂 ప్లంబర్ లేదా వంటవాడు లాంటి పని చెప్పండి, లేదా కింది బటన్ నొక్కండి.',
+ ch_apply:'దరఖాస్తు ఎలా',ch_call:'పనివారికి కాల్',ch_pay:'సాధారణ వేతనం'},
+ta:{tag:'இன்று, உங்கள் அருகில் வேலை',find_work:'வேலை தேடுங்கள்',find_worker:'தொழிலாளர் தேடுங்கள்',post_job:'வேலை பதிவிடுங்கள்',assistant:'உதவியாளர்',
+ search_ph:'தேடுங்கள்: பிளம்பர், சமையல்காரர், ஓட்டுநர்…',tap_speak:'தொட்டு பேசுங்கள்',listening:'கேட்கிறேன்…',nearby:'அருகில்',away:'கி.மீ தொலைவு',call_app:'செயலியில் அழைக்கவும்',
+ apply:'விண்ணப்பிக்கவும்',applied:'விண்ணப்பித்தீர்கள் ✓',per_day:'ஒரு நாளுக்கு',verified:'சரிபார்க்கப்பட்டது',job_name:'வேலையின் பெயர்',category:'வேலை வகை',job_type:'வேலை காலம்',
+ daily:'தினசரி',weekly:'வாராந்திர',contract:'ஒப்பந்தம்',need:'எத்தனை பேர் தேவை',pay:'கூலி (₹ ஒரு நாளுக்கு)',vehicle:'வாகனம் வழங்கப்படும்',drinks:'தேநீர் / தண்ணீர் / பானம் வழங்கப்படும்',
+ yes:'ஆம்',no:'இல்லை',driver_v:'ஓட்டுநர் சரிபார்க்கப்பட்டவர் (உரிமம் சோதிக்கப்பட்டது)',place:'இடம்',agree:'தொழிலாளர் விதிகளை ஏற்கிறேன்',submit:'வேலை பதிவிடுங்கள்',home:'முகப்பு',jobs:'வேலைகள்',
+ alerts:'அறிவிப்பு',rules:'தொழிலாளர் விதிகள்',t1:'குழந்தைத் தொழிலாளர் கூடாது. ஒவ்வொரு தொழிலாளருக்கும் 18 வயது நிரம்பியிருக்க வேண்டும்.',
+ t2:'சட்டப்படி வேலை செய்யத் தகுதியுள்ளவர்கள் மட்டும். கட்டாய அல்லது கூலி இல்லா வேலை கூடாது.',t3:'வாகனம் தந்தால் ஓட்டுநர் செல்லுபடியாகும் உரிமத்துடன் சரிபார்க்கப்பட்டவராக இருக்க வேண்டும்.',
+ t4:'வேலை தொடங்கும் முன் கூலியை சொல்ல வேண்டும்; நேரத்தில் கொடுக்க வேண்டும்.',age18:'எனக்கு 18 வயது நிரம்பியது, வேலை செய்யத் தகுதி உள்ளது',confirm:'உறுதி செய்',cancel:'ரத்து',
+ calling:'அழைக்கிறது…',end:'அழைப்பை முடி',hidden:'உங்கள் தனிப்பட்ட எண் மறைக்கப்படும். அழைப்பு செயலி வழியாக நடக்கும்.',no_results:'அருகில் எதுவும் இல்லை',
+ posted:'வேலை பதிவானது. அருகிலுள்ளவர்களுக்கு தெரிவிக்கப்பட்டது.',all:'அனைத்தும்',ask_ph:'உதவியாளரிடம் கேளுங்கள்…',send:'அனுப்பு',
+ as_hello:'வணக்கம்! வேலை தேட, விண்ணப்பிக்க, விதிகளை விளக்க உதவுவேன்.',as_found:'{c} க்கு {n} முடிவுகள் கிடைத்தன. கீழே உள்ள பொத்தானை அழுத்தவும்.',
+ as_apply:'விண்ணப்பிக்க: "வேலைகள்" திறந்து, வேலையைத் தேர்ந்து, "விண்ணப்பிக்கவும்" அழுத்தி 18+ உறுதி செய்யுங்கள்.',as_greet:'வணக்கம்! 👋 நான் காம் மித்ரா. உங்களுக்கு என்ன வேலை வேண்டும் என்று சொல்லுங்கள், பிளம்பர் அல்லது சமையல்காரர் போல, அருகில் தேடித் தருகிறேன்.',
+ as_thanks:'பரவாயில்லை! 😊 வேறு உதவி வேண்டுமா?',
+ as_post:'வேலை பதிவிட: "வேலை பதிவிடுங்கள்" தொட்டு, வேலை பெயர், கூலி, இடம் நிரப்பி, வாகனம் அல்லது தேநீர் உண்டா என்று சொல்லி, தொழிலாளர் விதிகளை ஏற்கவும்.',
+ as_call:'தொழிலாளரை அழைக்க: வேலையைத் தேடுங்கள், எ.கா. பிளம்பர், பிறகு பச்சை "செயலியில் அழைக்கவும்" தொடவும். உங்கள் எண் மறைக்கப்படும்.',
+ as_pay:'{c} வேலைக்கு அருகில் நாளுக்கு சுமார் ₹{p} கிடைக்கிறது.',
+ as_pay_ask:'எந்த வேலை என்று சொல்லுங்கள், சமையல்காரர் அல்லது ஓட்டுநர் போல, வழக்கமான கூலி சொல்கிறேன்.',
+ as_alerts:'விண்ணப்பிக்கும்போது அல்லது புதிய வேலை வரும்போது அறிவிப்பு வரும். மேலே மணியைத் தொட்டுப் பாருங்கள்.',
+ as_default:'மன்னிக்கவும், புரியவில்லை. 🙂 பிளம்பர் அல்லது சமையல்காரர் போன்ற வேலையைச் சொல்லுங்கள், அல்லது கீழே உள்ள பொத்தானைத் தொடுங்கள்.',
+ ch_apply:'விண்ணப்பிப்பது எப்படி',ch_call:'தொழிலாளருக்கு அழைப்பு',ch_pay:'வழக்கமான கூலி'},
+kn:{tag:'ಇಂದು, ನಿಮ್ಮ ಹತ್ತಿರವೇ ಕೆಲಸ',find_work:'ಕೆಲಸ ಹುಡುಕಿ',find_worker:'ಕೆಲಸಗಾರರನ್ನು ಹುಡುಕಿ',post_job:'ಕೆಲಸ ಹಾಕಿ',assistant:'ಸಹಾಯಕ',
+ search_ph:'ಹುಡುಕಿ: ಪ್ಲಂಬರ್, ಅಡುಗೆಯವರು, ಚಾಲಕ…',tap_speak:'ಒತ್ತಿ ಮಾತನಾಡಿ',listening:'ಕೇಳುತ್ತಿದ್ದೇನೆ…',nearby:'ಹತ್ತಿರ',away:'ಕಿ.ಮೀ ದೂರ',call_app:'ಆ್ಯಪ್‌ನಲ್ಲಿ ಕರೆ ಮಾಡಿ',
+ apply:'ಅರ್ಜಿ ಹಾಕಿ',applied:'ಅರ್ಜಿ ಹಾಕಿದ್ದೀರಿ ✓',per_day:'ದಿನಕ್ಕೆ',verified:'ಪರಿಶೀಲಿಸಲಾಗಿದೆ',job_name:'ಕೆಲಸದ ಹೆಸರು',category:'ಕೆಲಸದ ಬಗೆ',job_type:'ಕೆಲಸದ ಅವಧಿ',
+ daily:'ದಿನಗೂಲಿ',weekly:'ವಾರದ',contract:'ಗುತ್ತಿಗೆ',need:'ಎಷ್ಟು ಜನ ಬೇಕು',pay:'ಕೂಲಿ (₹ ದಿನಕ್ಕೆ)',vehicle:'ವಾಹನ ಕೊಡಲಾಗುತ್ತದೆ',drinks:'ಟೀ / ನೀರು / ಪಾನೀಯ ಕೊಡಲಾಗುತ್ತದೆ',
+ yes:'ಹೌದು',no:'ಇಲ್ಲ',driver_v:'ಚಾಲಕ ಪರಿಶೀಲಿತ (ಪರವಾನಗಿ ಪರಿಶೀಲನೆ)',place:'ಸ್ಥಳ',agree:'ನಾನು ಕಾರ್ಮಿಕ ನಿಯಮಗಳಿಗೆ ಒಪ್ಪುತ್ತೇನೆ',submit:'ಕೆಲಸ ಹಾಕಿ',home:'ಮುಖಪುಟ',jobs:'ಕೆಲಸಗಳು',
+ alerts:'ಸೂಚನೆ',rules:'ಕಾರ್ಮಿಕ ನಿಯಮಗಳು',t1:'ಬಾಲ ಕಾರ್ಮಿಕರು ಬೇಡ. ಪ್ರತಿ ಕೆಲಸಗಾರರಿಗೆ 18 ವರ್ಷ ತುಂಬಿರಬೇಕು.',
+ t2:'ಕಾನೂನುಬದ್ಧವಾಗಿ ಕೆಲಸ ಮಾಡಲು ಅರ್ಹರು ಮಾತ್ರ. ಬಲವಂತದ ಅಥವಾ ಕೂಲಿ ಇಲ್ಲದ ಕೆಲಸ ಬೇಡ.',t3:'ವಾಹನ ಕೊಟ್ಟರೆ ಚಾಲಕ ಮಾನ್ಯ ಪರವಾನಗಿಯೊಂದಿಗೆ ಪರಿಶೀಲಿತರಾಗಿರಬೇಕು.',
+ t4:'ಕೆಲಸ ಶುರುವಾಗುವ ಮೊದಲು ಕೂಲಿ ಹೇಳಬೇಕು ಮತ್ತು ಸಮಯಕ್ಕೆ ಕೊಡಬೇಕು.',age18:'ನನಗೆ 18 ವರ್ಷ ತುಂಬಿದೆ, ಕೆಲಸ ಮಾಡಲು ಅರ್ಹನಿದ್ದೇನೆ',confirm:'ಖಚಿತಪಡಿಸಿ',cancel:'ರದ್ದು',
+ calling:'ಕರೆ ಆಗುತ್ತಿದೆ…',end:'ಕರೆ ಮುಗಿಸಿ',hidden:'ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಸಂಖ್ಯೆ ಮರೆಯಾಗಿರುತ್ತದೆ. ಕರೆ ಆ್ಯಪ್ ಮೂಲಕ ಹೋಗುತ್ತದೆ.',no_results:'ಹತ್ತಿರ ಏನೂ ಸಿಗಲಿಲ್ಲ',
+ posted:'ಕೆಲಸ ಹಾಕಲಾಗಿದೆ. ಹತ್ತಿರದವರಿಗೆ ತಿಳಿಸಲಾಗಿದೆ.',all:'ಎಲ್ಲಾ',ask_ph:'ಸಹಾಯಕನನ್ನು ಕೇಳಿ…',send:'ಕಳುಹಿಸಿ',
+ as_hello:'ನಮಸ್ಕಾರ! ಕೆಲಸ ಹುಡುಕಲು, ಅರ್ಜಿ ಹಾಕಲು, ನಿಯಮ ತಿಳಿಸಲು ಸಹಾಯ ಮಾಡುತ್ತೇನೆ.',as_found:'{c} ಗೆ {n} ಫಲಿತಾಂಶ ಸಿಕ್ಕಿವೆ. ಕೆಳಗಿನ ಬಟನ್ ಒತ್ತಿ.',
+ as_apply:'ಅರ್ಜಿಗೆ: "ಕೆಲಸಗಳು" ತೆರೆಯಿರಿ, ಕೆಲಸ ಆರಿಸಿ, "ಅರ್ಜಿ ಹಾಕಿ" ಒತ್ತಿ 18+ ಖಚಿತಪಡಿಸಿ.',as_greet:'ನಮಸ್ಕಾರ! 👋 ನಾನು ಕಾಮ್ ಮಿತ್ರ. ನಿಮಗೆ ಯಾವ ಕೆಲಸ ಬೇಕು ಹೇಳಿ, ಪ್ಲಂಬರ್ ಅಥವಾ ಅಡುಗೆಯವರು ಹಾಗೆ, ಹತ್ತಿರದಲ್ಲಿ ಹುಡುಕಿ ಕೊಡುತ್ತೇನೆ.',
+ as_thanks:'ಪರವಾಗಿಲ್ಲ! 😊 ಇನ್ನೇನಾದರೂ ಸಹಾಯ ಬೇಕೇ?',
+ as_post:'ಕೆಲಸ ಹಾಕಲು: "ಕೆಲಸ ಹಾಕಿ" ಒತ್ತಿ, ಕೆಲಸದ ಹೆಸರು, ಕೂಲಿ, ಸ್ಥಳ ತುಂಬಿ, ವಾಹನ ಅಥವಾ ಟೀ ಕೊಡುತ್ತೀರಾ ಹೇಳಿ, ಕಾರ್ಮಿಕ ನಿಯಮಗಳಿಗೆ ಒಪ್ಪಿ.',
+ as_call:'ಕೆಲಸಗಾರರಿಗೆ ಕರೆ ಮಾಡಲು: ಕೆಲಸ ಹುಡುಕಿ, ಉದಾ. ಪ್ಲಂಬರ್, ನಂತರ ಹಸಿರು "ಆ್ಯಪ್‌ನಲ್ಲಿ ಕರೆ ಮಾಡಿ" ಒತ್ತಿ. ನಿಮ್ಮ ಸಂಖ್ಯೆ ಮರೆಯಾಗಿರುತ್ತದೆ.',
+ as_pay:'{c} ಕೆಲಸಕ್ಕೆ ಹತ್ತಿರದಲ್ಲಿ ದಿನಕ್ಕೆ ಸುಮಾರು ₹{p} ಸಿಗುತ್ತದೆ.',
+ as_pay_ask:'ಯಾವ ಕೆಲಸ ಹೇಳಿ, ಅಡುಗೆಯವರು ಅಥವಾ ಚಾಲಕ ಹಾಗೆ, ಸಾಮಾನ್ಯ ಕೂಲಿ ಹೇಳುತ್ತೇನೆ.',
+ as_alerts:'ಅರ್ಜಿ ಹಾಕಿದಾಗ ಅಥವಾ ಹೊಸ ಕೆಲಸ ಬಂದಾಗ ಸೂಚನೆ ಬರುತ್ತದೆ. ಮೇಲಿನ ಗಂಟೆ ಒತ್ತಿ ನೋಡಿ.',
+ as_default:'ಕ್ಷಮಿಸಿ, ಅರ್ಥವಾಗಲಿಲ್ಲ. 🙂 ಪ್ಲಂಬರ್ ಅಥವಾ ಅಡುಗೆಯವರು ಹಾಗೆ ಕೆಲಸ ಹೇಳಿ, ಅಥವಾ ಕೆಳಗಿನ ಬಟನ್ ಒತ್ತಿ.',
+ ch_apply:'ಅರ್ಜಿ ಹೇಗೆ',ch_call:'ಕೆಲಸಗಾರರಿಗೆ ಕರೆ',ch_pay:'ಸಾಮಾನ್ಯ ಕೂಲಿ'},
+bn:{tag:'আজ, আপনার কাছেই কাজ',find_work:'কাজ খুঁজুন',find_worker:'কর্মী খুঁজুন',post_job:'কাজ দিন',assistant:'সহায়ক',
+ search_ph:'খুঁজুন: প্লাম্বার, রাঁধুনি, ড্রাইভার…',tap_speak:'চেপে বলুন',listening:'শুনছি…',nearby:'কাছাকাছি',away:'কিমি দূরে',call_app:'অ্যাপে কল করুন',
+ apply:'আবেদন করুন',applied:'আবেদন হয়েছে ✓',per_day:'প্রতিদিন',verified:'যাচাই করা',job_name:'কাজের নাম',category:'কাজের ধরন',job_type:'কাজের মেয়াদ',
+ daily:'দৈনিক',weekly:'সাপ্তাহিক',contract:'চুক্তি',need:'কতজন লাগবে',pay:'মজুরি (₹ প্রতিদিন)',vehicle:'গাড়ি দেওয়া হবে',drinks:'চা / জল / পানীয় দেওয়া হবে',
+ yes:'হ্যাঁ',no:'না',driver_v:'ড্রাইভার যাচাই করা (লাইসেন্স দেখা হয়েছে)',place:'জায়গা',agree:'আমি শ্রম নিয়মে রাজি',submit:'কাজ দিন',home:'হোম',jobs:'কাজ',
+ alerts:'বার্তা',rules:'শ্রম নিয়ম',t1:'শিশুশ্রম নয়। প্রতিটি কর্মীর বয়স ১৮ বা তার বেশি হতে হবে।',
+ t2:'শুধু আইনত কাজ করার যোগ্য মানুষ। জোরপূর্বক বা বিনা মজুরির কাজ নয়।',t3:'গাড়ি দিলে ড্রাইভারকে বৈধ লাইসেন্সসহ যাচাই করা হতে হবে।',
+ t4:'কাজ শুরুর আগে মজুরি জানাতে হবে এবং সময়মতো দিতে হবে।',age18:'আমার বয়স ১৮ বা বেশি এবং আমি কাজ করতে যোগ্য',confirm:'নিশ্চিত করুন',cancel:'বাতিল',
+ calling:'কল হচ্ছে…',end:'কল শেষ',hidden:'আপনার ব্যক্তিগত নম্বর লুকানো থাকে। কল অ্যাপের মাধ্যমে যায়।',no_results:'কাছে কিছু পাওয়া যায়নি',
+ posted:'কাজ দেওয়া হয়েছে। কাছের কর্মীদের জানানো হয়েছে।',all:'সব',ask_ph:'সহায়ককে জিজ্ঞাসা করুন…',send:'পাঠান',
+ as_hello:'নমস্কার! কাজ খুঁজতে, আবেদন করতে ও নিয়ম বুঝতে সাহায্য করব।',as_found:'{c} এর জন্য {n}টি ফল পাওয়া গেছে। নিচের বোতাম চাপুন।',
+ as_apply:'আবেদনের জন্য: "কাজ" খুলুন, কাজ বেছে "আবেদন করুন" চাপুন এবং ১৮+ নিশ্চিত করুন।',as_greet:'নমস্কার! 👋 আমি কাম মিত্র। কোন কাজ চান বলুন, যেমন প্লাম্বার বা রাঁধুনি, কাছাকাছি খুঁজে দেব।',
+ as_thanks:'কোনো ব্যাপার না! 😊 আর কিছু সাহায্য লাগবে?',
+ as_post:'কাজ দিতে: "কাজ দিন" চাপুন, কাজের নাম, মজুরি, জায়গা লিখুন, গাড়ি বা চা দেবেন কি না জানান, তারপর শ্রম নিয়মে রাজি হন।',
+ as_call:'কর্মীকে কল করতে: কাজ খুঁজুন, যেমন প্লাম্বার, তারপর সবুজ "অ্যাপে কল করুন" চাপুন। আপনার নম্বর লুকানো থাকবে।',
+ as_pay:'{c} কাজে কাছাকাছি প্রতিদিন প্রায় ₹{p} মেলে।',
+ as_pay_ask:'কোন কাজ বলুন, যেমন রাঁধুনি বা ড্রাইভার, সাধারণ মজুরি জানিয়ে দেব।',
+ as_alerts:'আবেদন করলে বা নতুন কাজ এলে বার্তা পাবেন। ওপরের ঘণ্টা চেপে দেখুন।',
+ as_default:'দুঃখিত, বুঝতে পারিনি। 🙂 প্লাম্বার বা রাঁধুনির মতো কাজ বলুন, অথবা নিচের বোতাম চাপুন।',
+ ch_apply:'কীভাবে আবেদন',ch_call:'কর্মীকে কল',ch_pay:'সাধারণ মজুরি'},
+mr:{tag:'आज, तुमच्या जवळ काम',find_work:'काम शोधा',find_worker:'कामगार शोधा',post_job:'काम टाका',assistant:'सहाय्यक',
+ search_ph:'शोधा: प्लंबर, स्वयंपाकी, ड्रायव्हर…',tap_speak:'दाबा आणि बोला',listening:'ऐकत आहे…',nearby:'जवळ',away:'किमी अंतरावर',call_app:'अ‍ॅपमध्ये कॉल करा',
+ apply:'अर्ज करा',applied:'अर्ज केला ✓',per_day:'दररोज',verified:'पडताळलेला',job_name:'कामाचे नाव',category:'कामाचा प्रकार',job_type:'कामाचा कालावधी',
+ daily:'रोजंदारी',weekly:'साप्ताहिक',contract:'कंत्राट',need:'किती जण हवेत',pay:'मजुरी (₹ दररोज)',vehicle:'वाहन दिले जाईल',drinks:'चहा / पाणी / पेय दिले जाईल',
+ yes:'हो',no:'नाही',driver_v:'ड्रायव्हर पडताळलेला (परवाना तपासला)',place:'ठिकाण',agree:'मी श्रम नियमांना सहमत आहे',submit:'काम टाका',home:'मुख्यपृष्ठ',jobs:'कामे',
+ alerts:'सूचना',rules:'श्रम नियम',t1:'बालमजुरी नाही. प्रत्येक कामगाराचे वय १८ किंवा जास्त असावे.',
+ t2:'फक्त कायदेशीररीत्या काम करू शकणारे लोक. जबरदस्तीचे किंवा बिनमजुरीचे काम नाही.',t3:'वाहन दिल्यास ड्रायव्हर वैध परवान्यासह पडताळलेला असावा.',
+ t4:'काम सुरू होण्याआधी मजुरी सांगावी आणि वेळेवर द्यावी.',age18:'माझे वय १८ किंवा जास्त आहे आणि मी काम करण्यास पात्र आहे',confirm:'पक्के करा',cancel:'रद्द',
+ calling:'कॉल लागत आहे…',end:'कॉल संपवा',hidden:'तुमचा वैयक्तिक नंबर लपलेला राहतो. कॉल अ‍ॅपमधून जातो.',no_results:'जवळ काही सापडले नाही',
+ posted:'काम टाकले. जवळच्या कामगारांना कळवले.',all:'सर्व',ask_ph:'सहाय्यकाला विचारा…',send:'पाठवा',
+ as_hello:'नमस्कार! काम शोधणे, अर्ज करणे आणि नियम समजावणे यात मदत करतो.',as_found:'{c} साठी {n} निकाल मिळाले. खालील बटण दाबा.',
+ as_apply:'अर्जासाठी: "कामे" उघडा, काम निवडा, "अर्ज करा" दाबा आणि १८+ पक्के करा.',as_greet:'नमस्कार! 👋 मी काम मित्र. कोणते काम हवे ते सांगा, जसे प्लंबर किंवा स्वयंपाकी, मी जवळ शोधून देतो.',
+ as_thanks:'ठीक आहे! 😊 आणखी काही मदत हवी का?',
+ as_post:'काम टाकण्यासाठी: "काम टाका" दाबा, कामाचे नाव, मजुरी, ठिकाण भरा, वाहन किंवा चहा मिळेल का सांगा, मग श्रम नियमांना सहमत व्हा.',
+ as_call:'कामगाराला कॉल करण्यासाठी: काम शोधा, जसे प्लंबर, मग हिरवे "अ‍ॅपमध्ये कॉल करा" दाबा. तुमचा नंबर लपलेला राहील.',
+ as_pay:'{c} कामासाठी जवळ दररोज सुमारे ₹{p} मिळतात.',
+ as_pay_ask:'कोणते काम ते सांगा, जसे स्वयंपाकी किंवा ड्रायव्हर, मी सामान्य मजुरी सांगतो.',
+ as_alerts:'अर्ज केल्यावर किंवा नवीन काम आल्यावर सूचना मिळेल. वरची घंटा दाबून पहा.',
+ as_default:'माफ करा, समजले नाही. 🙂 प्लंबर किंवा स्वयंपाकी असे काम सांगा, किंवा खालचे बटण दाबा.',
+ ch_apply:'अर्ज कसा करायचा',ch_call:'कामगाराला कॉल',ch_pay:'सामान्य मजुरी'}
+};
+
+/* Strings for the landing page, registration, OTP login and the separate worker and employer screens */
+const NEWS={
+en:{l_h:'Daily work, made simple',l_p:'Find jobs near you or hire skilled people, in your own language. Safe, verified and free to start.',
+ login:'Login',register:'Register',create:'Create account',i_work:'I want work',i_hire:'I want to hire',
+ w_b1:'Find jobs near you',w_b2:'Apply in one tap',w_b3:'Get alerts for new work',
+ e_b1:'Post a job in a minute',e_b2:'Call workers inside the app',e_b3:'Only verified drivers and legal workers',
+ how:'How it works',s1:'Register with your mobile number',s2:'Verify with a one-time password (OTP)',s3:'Find work or hire people nearby',
+ safe_t:'Safe and legal for everyone',phone:'Mobile number',send_otp:'Send OTP',enter_otp:'Enter the 6-digit OTP',otp_sent:'OTP sent to +91 {p}',
+ verify:'Verify and continue',resend:'Resend OTP',resend_in:'Resend in {s} sec',otp_demo:'Demo mode: your OTP is {c}. A live app sends this by SMS.',
+ bad_phone:'Enter a valid 10-digit mobile number',bad_otp:'Wrong OTP. Please try again',otp_exp:'OTP expired. Please send a new one',
+ no_acct:'No account for this number. Please register first.',has_acct:'This number is already registered. Please login.',
+ who:'Who are you?',worker_role:'Worker',employer_role:'Employer',full_name:'Full name',biz:'Business or employer name',skill:'Your main work',
+ exp:'Years of experience',area:'Area or town',etype:'Employer type',indiv:'Individual',company:'Company',back:'Back',
+ logout:'Logout',profile:'Profile',hello:'Hello, {n}',have_acct:'Already registered? Login',new_here:'New here? Register',
+ err_name:'Please enter your name',err_area:'Please enter your area',err_age:'You must be 18 or older to register',
+ my_apps:'My applications',applied_tab:'Applied',no_apps:'You have not applied for any job yet',st_applied:'Waiting',st_accepted:'Accepted',st_rejected:'Not selected',
+ jobs_for_you:'Jobs for you',my_jobs:'My jobs',mj_tab:'My jobs',applicants:'Applicants',no_jobs:'You have not posted a job yet',accept:'Accept',decline:'Decline',
+ active_jobs:'Active jobs',waiting:'Waiting',recent_app:'Recent applicants',close_job:'Close job',closed:'Closed',open_s:'Open',
+ sample_note:'Sample applicants are added so you can try this screen.',job_accepted:'You were accepted for',job_rejected:'You were not selected for',
+ new_applicant:'New applicant for',no_app_yet:'No applicants yet',acct_ok:'Account created. Welcome!',logged_out:'You are logged out',
+ role_w:'Worker account',role_e:'Employer account',
+ as_post_w:'Only employers can post jobs. You can search jobs and apply from the Find work tab.',
+ as_call_w:'Employers call workers inside the app. Apply for jobs and wait for them to accept you.',
+ as_apply_e:'Workers apply to your jobs. Open My jobs to see applicants and accept them.'},
+hi:{l_h:'रोज़ का काम, आसान तरीके से',l_p:'अपनी भाषा में पास का काम खोजें या हुनरमंद लोगों को काम पर रखें। सुरक्षित, सत्यापित और शुरू करना मुफ़्त।',
+ login:'लॉगिन',register:'रजिस्टर करें',create:'खाता बनाएँ',i_work:'मुझे काम चाहिए',i_hire:'मुझे कामगार चाहिए',
+ w_b1:'अपने पास का काम खोजें',w_b2:'एक टैप में आवेदन करें',w_b3:'नए काम की सूचना पाएँ',
+ e_b1:'एक मिनट में काम डालें',e_b2:'ऐप में ही कामगारों को कॉल करें',e_b3:'केवल सत्यापित ड्राइवर और कानूनी कामगार',
+ how:'यह कैसे काम करता है',s1:'मोबाइल नंबर से रजिस्टर करें',s2:'OTP से पुष्टि करें',s3:'पास में काम खोजें या कामगार रखें',
+ safe_t:'सबके लिए सुरक्षित और कानूनी',phone:'मोबाइल नंबर',send_otp:'OTP भेजें',enter_otp:'6 अंकों का OTP डालें',otp_sent:'OTP +91 {p} पर भेजा गया',
+ verify:'पुष्टि करें और आगे बढ़ें',resend:'OTP दोबारा भेजें',resend_in:'{s} सेकंड में दोबारा भेजें',otp_demo:'डेमो मोड: आपका OTP {c} है। असली ऐप इसे SMS से भेजता है।',
+ bad_phone:'सही 10 अंकों का मोबाइल नंबर डालें',bad_otp:'गलत OTP। फिर से कोशिश करें',otp_exp:'OTP की समय सीमा खत्म। नया OTP भेजें',
+ no_acct:'इस नंबर का खाता नहीं मिला। पहले रजिस्टर करें।',has_acct:'यह नंबर पहले से रजिस्टर है। लॉगिन करें।',
+ who:'आप कौन हैं?',worker_role:'कामगार',employer_role:'नियोक्ता',full_name:'पूरा नाम',biz:'व्यवसाय या नियोक्ता का नाम',skill:'आपका मुख्य काम',
+ exp:'अनुभव (साल)',area:'इलाका या शहर',etype:'नियोक्ता का प्रकार',indiv:'व्यक्ति',company:'कंपनी',back:'वापस',
+ logout:'लॉगआउट',profile:'प्रोफ़ाइल',hello:'नमस्ते, {n}',have_acct:'पहले से रजिस्टर हैं? लॉगिन करें',new_here:'नए हैं? रजिस्टर करें',
+ err_name:'कृपया अपना नाम डालें',err_area:'कृपया अपना इलाका डालें',err_age:'रजिस्टर करने के लिए उम्र 18 साल या अधिक होनी चाहिए',
+ my_apps:'मेरे आवेदन',applied_tab:'आवेदन',no_apps:'आपने अभी तक किसी काम के लिए आवेदन नहीं किया',st_applied:'इंतज़ार में',st_accepted:'स्वीकार',st_rejected:'चुना नहीं गया',
+ jobs_for_you:'आपके लिए काम',my_jobs:'मेरे काम',mj_tab:'मेरे काम',applicants:'आवेदक',no_jobs:'आपने अभी तक कोई काम नहीं डाला',accept:'स्वीकारें',decline:'मना करें',
+ active_jobs:'चालू काम',waiting:'इंतज़ार में',recent_app:'नए आवेदक',close_job:'काम बंद करें',closed:'बंद',open_s:'खुला',
+ sample_note:'आप इस स्क्रीन को आज़मा सकें इसलिए नमूना आवेदक जोड़े गए हैं।',job_accepted:'आपको चुना गया:',job_rejected:'आप इसके लिए नहीं चुने गए:',
+ new_applicant:'नया आवेदक:',no_app_yet:'अभी कोई आवेदक नहीं',acct_ok:'खाता बन गया। स्वागत है!',logged_out:'आप लॉगआउट हो गए',
+ role_w:'कामगार खाता',role_e:'नियोक्ता खाता',
+ as_post_w:'काम केवल नियोक्ता डाल सकते हैं। आप "काम खोजें" टैब में काम खोजकर आवेदन कर सकते हैं।',
+ as_call_w:'नियोक्ता ऐप में कामगारों को कॉल करते हैं। काम के लिए आवेदन करें और चुने जाने का इंतज़ार करें।',
+ as_apply_e:'कामगार आपके काम के लिए आवेदन करते हैं। "मेरे काम" में आवेदक देखें और स्वीकार करें।'},
+te:{l_h:'రోజువారీ పని, సులభంగా',l_p:'మీ భాషలోనే దగ్గరలో పని వెతకండి లేదా నైపుణ్యం ఉన్నవారిని నియమించండి. సురక్షితం, ధృవీకరించబడినది, ప్రారంభించడం ఉచితం.',
+ login:'లాగిన్',register:'నమోదు చేయండి',create:'ఖాతా సృష్టించండి',i_work:'నాకు పని కావాలి',i_hire:'నాకు పనివారు కావాలి',
+ w_b1:'దగ్గరలో పని వెతకండి',w_b2:'ఒక్క టాప్‌లో దరఖాస్తు',w_b3:'కొత్త పనుల సమాచారం పొందండి',
+ e_b1:'ఒక నిమిషంలో పని పోస్ట్ చేయండి',e_b2:'యాప్‌లోనే పనివారికి కాల్ చేయండి',e_b3:'ధృవీకరించిన డ్రైవర్లు, చట్టబద్ధ కార్మికులు మాత్రమే',
+ how:'ఇది ఎలా పనిచేస్తుంది',s1:'మొబైల్ నంబర్‌తో నమోదు చేయండి',s2:'OTPతో ధృవీకరించండి',s3:'దగ్గరలో పని వెతకండి లేదా పనివారిని నియమించండి',
+ safe_t:'అందరికీ సురక్షితం, చట్టబద్ధం',phone:'మొబైల్ నంబర్',send_otp:'OTP పంపండి',enter_otp:'6 అంకెల OTP నమోదు చేయండి',otp_sent:'OTP +91 {p} కు పంపబడింది',
+ verify:'ధృవీకరించి కొనసాగండి',resend:'OTP మళ్లీ పంపండి',resend_in:'{s} సెకన్లలో మళ్లీ పంపవచ్చు',otp_demo:'డెమో మోడ్: మీ OTP {c}. నిజమైన యాప్ దీన్ని SMS ద్వారా పంపుతుంది.',
+ bad_phone:'సరైన 10 అంకెల మొబైల్ నంబర్ ఇవ్వండి',bad_otp:'తప్పు OTP. మళ్లీ ప్రయత్నించండి',otp_exp:'OTP గడువు ముగిసింది. కొత్తది పంపండి',
+ no_acct:'ఈ నంబర్‌కు ఖాతా లేదు. ముందు నమోదు చేయండి.',has_acct:'ఈ నంబర్ ఇప్పటికే నమోదైంది. లాగిన్ చేయండి.',
+ who:'మీరు ఎవరు?',worker_role:'పనివారు',employer_role:'యజమాని',full_name:'పూర్తి పేరు',biz:'వ్యాపారం లేదా యజమాని పేరు',skill:'మీ ప్రధాన పని',
+ exp:'అనుభవం (సంవత్సరాలు)',area:'ప్రాంతం లేదా పట్టణం',etype:'యజమాని రకం',indiv:'వ్యక్తి',company:'కంపెనీ',back:'వెనుకకు',
+ logout:'లాగ్అవుట్',profile:'ప్రొఫైల్',hello:'నమస్తే, {n}',have_acct:'ఇప్పటికే నమోదు అయ్యారా? లాగిన్',new_here:'కొత్తవారా? నమోదు చేయండి',
+ err_name:'దయచేసి మీ పేరు నమోదు చేయండి',err_area:'దయచేసి మీ ప్రాంతం నమోదు చేయండి',err_age:'నమోదుకు 18 ఏళ్లు నిండి ఉండాలి',
+ my_apps:'నా దరఖాస్తులు',applied_tab:'దరఖాస్తులు',no_apps:'మీరు ఇంకా ఏ పనికీ దరఖాస్తు చేయలేదు',st_applied:'వేచి ఉంది',st_accepted:'అంగీకరించారు',st_rejected:'ఎంపిక కాలేదు',
+ jobs_for_you:'మీకు తగిన పనులు',my_jobs:'నా పనులు',mj_tab:'నా పనులు',applicants:'దరఖాస్తుదారులు',no_jobs:'మీరు ఇంకా ఏ పనీ పోస్ట్ చేయలేదు',accept:'అంగీకరించు',decline:'తిరస్కరించు',
+ active_jobs:'కొనసాగుతున్న పనులు',waiting:'వేచి ఉన్నవారు',recent_app:'కొత్త దరఖాస్తుదారులు',close_job:'పని ముగించు',closed:'ముగిసింది',open_s:'తెరిచి ఉంది',
+ sample_note:'ఈ స్క్రీన్ ప్రయత్నించడానికి నమూనా దరఖాస్తుదారులు చేర్చబడ్డారు.',job_accepted:'మీరు ఎంపికయ్యారు:',job_rejected:'మీరు ఎంపిక కాలేదు:',
+ new_applicant:'కొత్త దరఖాస్తుదారు:',no_app_yet:'ఇంకా దరఖాస్తుదారులు లేరు',acct_ok:'ఖాతా సృష్టించబడింది. స్వాగతం!',logged_out:'మీరు లాగ్అవుట్ అయ్యారు',
+ role_w:'పనివారి ఖాతా',role_e:'యజమాని ఖాతా',
+ as_post_w:'పనులను యజమానులు మాత్రమే పోస్ట్ చేయగలరు. "పని వెతకండి" ట్యాబ్‌లో వెతికి దరఖాస్తు చేయవచ్చు.',
+ as_call_w:'యజమానులు యాప్‌లోనే పనివారికి కాల్ చేస్తారు. పనులకు దరఖాస్తు చేసి ఎంపిక కోసం వేచి ఉండండి.',
+ as_apply_e:'పనివారు మీ పనులకు దరఖాస్తు చేస్తారు. "నా పనులు"లో దరఖాస్తుదారులను చూసి అంగీకరించండి.'},
+ta:{l_h:'தினசரி வேலை, எளிதாக',l_p:'உங்கள் மொழியிலேயே அருகில் வேலை தேடுங்கள் அல்லது திறமையானவர்களை பணியமர்த்துங்கள். பாதுகாப்பானது, சரிபார்க்கப்பட்டது, தொடங்க இலவசம்.',
+ login:'உள்நுழை',register:'பதிவு செய்',create:'கணக்கை உருவாக்கு',i_work:'எனக்கு வேலை வேண்டும்',i_hire:'எனக்கு ஆட்கள் வேண்டும்',
+ w_b1:'அருகில் வேலை தேடுங்கள்',w_b2:'ஒரே தொடுதலில் விண்ணப்பம்',w_b3:'புதிய வேலை அறிவிப்புகள் பெறுங்கள்',
+ e_b1:'ஒரு நிமிடத்தில் வேலை பதிவிடுங்கள்',e_b2:'செயலியிலேயே தொழிலாளர்களை அழையுங்கள்',e_b3:'சரிபார்க்கப்பட்ட ஓட்டுநர்கள், சட்டப்படி தகுதியான தொழிலாளர்கள் மட்டும்',
+ how:'இது எப்படி வேலை செய்கிறது',s1:'மொபைல் எண்ணுடன் பதிவு செய்யுங்கள்',s2:'OTP மூலம் உறுதி செய்யுங்கள்',s3:'அருகில் வேலை தேடுங்கள் அல்லது ஆட்களை அமர்த்துங்கள்',
+ safe_t:'அனைவருக்கும் பாதுகாப்பானது, சட்டப்படி சரியானது',phone:'மொபைல் எண்',send_otp:'OTP அனுப்பு',enter_otp:'6 இலக்க OTP உள்ளிடவும்',otp_sent:'OTP +91 {p} க்கு அனுப்பப்பட்டது',
+ verify:'உறுதி செய்து தொடரவும்',resend:'OTP மீண்டும் அனுப்பு',resend_in:'{s} விநாடியில் மீண்டும் அனுப்பலாம்',otp_demo:'டெமோ முறை: உங்கள் OTP {c}. உண்மையான செயலி இதை SMS மூலம் அனுப்பும்.',
+ bad_phone:'சரியான 10 இலக்க மொபைல் எண்ணை உள்ளிடவும்',bad_otp:'தவறான OTP. மீண்டும் முயற்சிக்கவும்',otp_exp:'OTP காலாவதியானது. புதியதை அனுப்பவும்',
+ no_acct:'இந்த எண்ணுக்கு கணக்கு இல்லை. முதலில் பதிவு செய்யுங்கள்.',has_acct:'இந்த எண் ஏற்கனவே பதிவாகியுள்ளது. உள்நுழையுங்கள்.',
+ who:'நீங்கள் யார்?',worker_role:'தொழிலாளர்',employer_role:'வேலை கொடுப்பவர்',full_name:'முழு பெயர்',biz:'நிறுவனம் அல்லது வேலை கொடுப்பவர் பெயர்',skill:'உங்கள் முக்கிய வேலை',
+ exp:'அனுபவம் (ஆண்டுகள்)',area:'பகுதி அல்லது ஊர்',etype:'வேலை கொடுப்பவர் வகை',indiv:'தனிநபர்',company:'நிறுவனம்',back:'பின்',
+ logout:'வெளியேறு',profile:'சுயவிவரம்',hello:'வணக்கம், {n}',have_acct:'ஏற்கனவே பதிவு செய்தீர்களா? உள்நுழை',new_here:'புதியவரா? பதிவு செய்யுங்கள்',
+ err_name:'உங்கள் பெயரை உள்ளிடவும்',err_area:'உங்கள் பகுதியை உள்ளிடவும்',err_age:'பதிவு செய்ய 18 வயது நிரம்பியிருக்க வேண்டும்',
+ my_apps:'என் விண்ணப்பங்கள்',applied_tab:'விண்ணப்பம்',no_apps:'நீங்கள் இன்னும் எந்த வேலைக்கும் விண்ணப்பிக்கவில்லை',st_applied:'காத்திருக்கிறது',st_accepted:'ஏற்கப்பட்டது',st_rejected:'தேர்வாகவில்லை',
+ jobs_for_you:'உங்களுக்கான வேலைகள்',my_jobs:'என் வேலைகள்',mj_tab:'என் வேலைகள்',applicants:'விண்ணப்பதாரர்கள்',no_jobs:'நீங்கள் இன்னும் எந்த வேலையும் பதிவிடவில்லை',accept:'ஏற்கவும்',decline:'மறுக்கவும்',
+ active_jobs:'நடப்பில் உள்ள வேலைகள்',waiting:'காத்திருப்பவர்',recent_app:'புதிய விண்ணப்பதாரர்கள்',close_job:'வேலையை மூடு',closed:'மூடப்பட்டது',open_s:'திறந்துள்ளது',
+ sample_note:'இந்தத் திரையை முயற்சிக்க மாதிரி விண்ணப்பதாரர்கள் சேர்க்கப்பட்டுள்ளனர்.',job_accepted:'நீங்கள் தேர்வாகினீர்கள்:',job_rejected:'நீங்கள் தேர்வாகவில்லை:',
+ new_applicant:'புதிய விண்ணப்பதாரர்:',no_app_yet:'இன்னும் விண்ணப்பதாரர்கள் இல்லை',acct_ok:'கணக்கு உருவாக்கப்பட்டது. வரவேற்கிறோம்!',logged_out:'நீங்கள் வெளியேறிவிட்டீர்கள்',
+ role_w:'தொழிலாளர் கணக்கு',role_e:'வேலை கொடுப்பவர் கணக்கு',
+ as_post_w:'வேலைகளை வேலை கொடுப்பவர்கள் மட்டுமே பதிவிட முடியும். "வேலை தேடுங்கள்" தாவலில் தேடி விண்ணப்பிக்கலாம்.',
+ as_call_w:'வேலை கொடுப்பவர்கள் செயலியிலேயே தொழிலாளர்களை அழைப்பார்கள். வேலைக்கு விண்ணப்பித்து தேர்வுக்காக காத்திருங்கள்.',
+ as_apply_e:'தொழிலாளர்கள் உங்கள் வேலைகளுக்கு விண்ணப்பிப்பார்கள். "என் வேலைகள்"ல் விண்ணப்பதாரர்களைப் பார்த்து ஏற்கவும்.'},
+kn:{l_h:'ದಿನಗೂಲಿ ಕೆಲಸ, ಸುಲಭವಾಗಿ',l_p:'ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲೇ ಹತ್ತಿರದ ಕೆಲಸ ಹುಡುಕಿ ಅಥವಾ ಕೌಶಲ್ಯವುಳ್ಳವರನ್ನು ನೇಮಿಸಿ. ಸುರಕ್ಷಿತ, ಪರಿಶೀಲಿತ, ಆರಂಭಿಸಲು ಉಚಿತ.',
+ login:'ಲಾಗಿನ್',register:'ನೋಂದಣಿ',create:'ಖಾತೆ ತೆರೆಯಿರಿ',i_work:'ನನಗೆ ಕೆಲಸ ಬೇಕು',i_hire:'ನನಗೆ ಕೆಲಸಗಾರರು ಬೇಕು',
+ w_b1:'ಹತ್ತಿರದ ಕೆಲಸ ಹುಡುಕಿ',w_b2:'ಒಂದೇ ಟ್ಯಾಪ್‌ನಲ್ಲಿ ಅರ್ಜಿ',w_b3:'ಹೊಸ ಕೆಲಸದ ಸೂಚನೆ ಪಡೆಯಿರಿ',
+ e_b1:'ಒಂದು ನಿಮಿಷದಲ್ಲಿ ಕೆಲಸ ಹಾಕಿ',e_b2:'ಆ್ಯಪ್‌ನಲ್ಲೇ ಕೆಲಸಗಾರರಿಗೆ ಕರೆ ಮಾಡಿ',e_b3:'ಪರಿಶೀಲಿತ ಚಾಲಕರು ಮತ್ತು ಕಾನೂನುಬದ್ಧ ಕೆಲಸಗಾರರು ಮಾತ್ರ',
+ how:'ಇದು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ',s1:'ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯಿಂದ ನೋಂದಣಿ ಮಾಡಿ',s2:'OTP ಮೂಲಕ ಖಚಿತಪಡಿಸಿ',s3:'ಹತ್ತಿರದಲ್ಲಿ ಕೆಲಸ ಹುಡುಕಿ ಅಥವಾ ಜನರನ್ನು ನೇಮಿಸಿ',
+ safe_t:'ಎಲ್ಲರಿಗೂ ಸುರಕ್ಷಿತ ಮತ್ತು ಕಾನೂನುಬದ್ಧ',phone:'ಮೊಬೈಲ್ ಸಂಖ್ಯೆ',send_otp:'OTP ಕಳುಹಿಸಿ',enter_otp:'6 ಅಂಕಿಯ OTP ನಮೂದಿಸಿ',otp_sent:'OTP +91 {p} ಗೆ ಕಳುಹಿಸಲಾಗಿದೆ',
+ verify:'ಖಚಿತಪಡಿಸಿ ಮುಂದುವರಿಯಿರಿ',resend:'OTP ಮತ್ತೆ ಕಳುಹಿಸಿ',resend_in:'{s} ಸೆಕೆಂಡಿನಲ್ಲಿ ಮತ್ತೆ ಕಳುಹಿಸಬಹುದು',otp_demo:'ಡೆಮೊ ಮೋಡ್: ನಿಮ್ಮ OTP {c}. ನಿಜವಾದ ಆ್ಯಪ್ ಇದನ್ನು SMS ಮೂಲಕ ಕಳುಹಿಸುತ್ತದೆ.',
+ bad_phone:'ಸರಿಯಾದ 10 ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನೀಡಿ',bad_otp:'ತಪ್ಪು OTP. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ',otp_exp:'OTP ಅವಧಿ ಮುಗಿದಿದೆ. ಹೊಸದನ್ನು ಕಳುಹಿಸಿ',
+ no_acct:'ಈ ಸಂಖ್ಯೆಗೆ ಖಾತೆ ಇಲ್ಲ. ಮೊದಲು ನೋಂದಣಿ ಮಾಡಿ.',has_acct:'ಈ ಸಂಖ್ಯೆ ಈಗಾಗಲೇ ನೋಂದಣಿಯಾಗಿದೆ. ಲಾಗಿನ್ ಮಾಡಿ.',
+ who:'ನೀವು ಯಾರು?',worker_role:'ಕೆಲಸಗಾರ',employer_role:'ಉದ್ಯೋಗದಾತ',full_name:'ಪೂರ್ಣ ಹೆಸರು',biz:'ವ್ಯಾಪಾರ ಅಥವಾ ಉದ್ಯೋಗದಾತರ ಹೆಸರು',skill:'ನಿಮ್ಮ ಮುಖ್ಯ ಕೆಲಸ',
+ exp:'ಅನುಭವ (ವರ್ಷಗಳು)',area:'ಪ್ರದೇಶ ಅಥವಾ ಊರು',etype:'ಉದ್ಯೋಗದಾತರ ಬಗೆ',indiv:'ವ್ಯಕ್ತಿ',company:'ಕಂಪನಿ',back:'ಹಿಂದೆ',
+ logout:'ಲಾಗ್‌ಔಟ್',profile:'ಪ್ರೊಫೈಲ್',hello:'ನಮಸ್ಕಾರ, {n}',have_acct:'ಈಗಾಗಲೇ ನೋಂದಣಿಯಾಗಿದೆಯೇ? ಲಾಗಿನ್',new_here:'ಹೊಸಬರೇ? ನೋಂದಣಿ ಮಾಡಿ',
+ err_name:'ದಯವಿಟ್ಟು ನಿಮ್ಮ ಹೆಸರು ನಮೂದಿಸಿ',err_area:'ದಯವಿಟ್ಟು ನಿಮ್ಮ ಪ್ರದೇಶ ನಮೂದಿಸಿ',err_age:'ನೋಂದಣಿಗೆ 18 ವರ್ಷ ತುಂಬಿರಬೇಕು',
+ my_apps:'ನನ್ನ ಅರ್ಜಿಗಳು',applied_tab:'ಅರ್ಜಿಗಳು',no_apps:'ನೀವು ಇನ್ನೂ ಯಾವ ಕೆಲಸಕ್ಕೂ ಅರ್ಜಿ ಹಾಕಿಲ್ಲ',st_applied:'ಕಾಯುತ್ತಿದೆ',st_accepted:'ಒಪ್ಪಿಕೊಳ್ಳಲಾಗಿದೆ',st_rejected:'ಆಯ್ಕೆಯಾಗಿಲ್ಲ',
+ jobs_for_you:'ನಿಮಗಾಗಿ ಕೆಲಸಗಳು',my_jobs:'ನನ್ನ ಕೆಲಸಗಳು',mj_tab:'ನನ್ನ ಕೆಲಸ',applicants:'ಅರ್ಜಿದಾರರು',no_jobs:'ನೀವು ಇನ್ನೂ ಯಾವ ಕೆಲಸವನ್ನೂ ಹಾಕಿಲ್ಲ',accept:'ಒಪ್ಪಿ',decline:'ತಿರಸ್ಕರಿಸಿ',
+ active_jobs:'ಚಾಲ್ತಿ ಕೆಲಸಗಳು',waiting:'ಕಾಯುತ್ತಿರುವವರು',recent_app:'ಹೊಸ ಅರ್ಜಿದಾರರು',close_job:'ಕೆಲಸ ಮುಚ್ಚಿ',closed:'ಮುಚ್ಚಲಾಗಿದೆ',open_s:'ತೆರೆದಿದೆ',
+ sample_note:'ಈ ಪರದೆಯನ್ನು ಪ್ರಯತ್ನಿಸಲು ಮಾದರಿ ಅರ್ಜಿದಾರರನ್ನು ಸೇರಿಸಲಾಗಿದೆ.',job_accepted:'ನೀವು ಆಯ್ಕೆಯಾಗಿದ್ದೀರಿ:',job_rejected:'ನೀವು ಆಯ್ಕೆಯಾಗಿಲ್ಲ:',
+ new_applicant:'ಹೊಸ ಅರ್ಜಿದಾರ:',no_app_yet:'ಇನ್ನೂ ಅರ್ಜಿದಾರರಿಲ್ಲ',acct_ok:'ಖಾತೆ ತೆರೆಯಲಾಗಿದೆ. ಸ್ವಾಗತ!',logged_out:'ನೀವು ಲಾಗ್‌ಔಟ್ ಆಗಿದ್ದೀರಿ',
+ role_w:'ಕೆಲಸಗಾರರ ಖಾತೆ',role_e:'ಉದ್ಯೋಗದಾತರ ಖಾತೆ',
+ as_post_w:'ಕೆಲಸ ಹಾಕುವುದು ಉದ್ಯೋಗದಾತರು ಮಾತ್ರ. "ಕೆಲಸ ಹುಡುಕಿ" ಟ್ಯಾಬ್‌ನಲ್ಲಿ ಹುಡುಕಿ ಅರ್ಜಿ ಹಾಕಬಹುದು.',
+ as_call_w:'ಉದ್ಯೋಗದಾತರು ಆ್ಯಪ್‌ನಲ್ಲೇ ಕೆಲಸಗಾರರಿಗೆ ಕರೆ ಮಾಡುತ್ತಾರೆ. ಕೆಲಸಕ್ಕೆ ಅರ್ಜಿ ಹಾಕಿ ಆಯ್ಕೆಗಾಗಿ ಕಾಯಿರಿ.',
+ as_apply_e:'ಕೆಲಸಗಾರರು ನಿಮ್ಮ ಕೆಲಸಗಳಿಗೆ ಅರ್ಜಿ ಹಾಕುತ್ತಾರೆ. "ನನ್ನ ಕೆಲಸ"ದಲ್ಲಿ ಅರ್ಜಿದಾರರನ್ನು ನೋಡಿ ಒಪ್ಪಿ.'},
+bn:{l_h:'দৈনিক কাজ, সহজ করে',l_p:'নিজের ভাষায় কাছাকাছি কাজ খুঁজুন বা দক্ষ কর্মী নিয়োগ করুন। নিরাপদ, যাচাই করা, শুরু করা বিনামূল্যে।',
+ login:'লগইন',register:'নিবন্ধন',create:'অ্যাকাউন্ট খুলুন',i_work:'আমি কাজ চাই',i_hire:'আমি কর্মী চাই',
+ w_b1:'কাছাকাছি কাজ খুঁজুন',w_b2:'এক ট্যাপে আবেদন',w_b3:'নতুন কাজের বার্তা পান',
+ e_b1:'এক মিনিটে কাজ দিন',e_b2:'অ্যাপের ভেতরেই কর্মীকে কল করুন',e_b3:'শুধু যাচাই করা ড্রাইভার ও আইনত কর্মী',
+ how:'এটি কীভাবে কাজ করে',s1:'মোবাইল নম্বর দিয়ে নিবন্ধন করুন',s2:'OTP দিয়ে যাচাই করুন',s3:'কাছাকাছি কাজ খুঁজুন বা কর্মী নিন',
+ safe_t:'সবার জন্য নিরাপদ ও আইনসম্মত',phone:'মোবাইল নম্বর',send_otp:'OTP পাঠান',enter_otp:'৬ সংখ্যার OTP লিখুন',otp_sent:'OTP +91 {p} নম্বরে পাঠানো হয়েছে',
+ verify:'যাচাই করে এগিয়ে যান',resend:'আবার OTP পাঠান',resend_in:'{s} সেকেন্ড পরে আবার পাঠানো যাবে',otp_demo:'ডেমো মোড: আপনার OTP {c}। আসল অ্যাপ এটি SMS-এ পাঠায়।',
+ bad_phone:'সঠিক ১০ সংখ্যার মোবাইল নম্বর দিন',bad_otp:'ভুল OTP। আবার চেষ্টা করুন',otp_exp:'OTP-র মেয়াদ শেষ। নতুন পাঠান',
+ no_acct:'এই নম্বরের অ্যাকাউন্ট নেই। আগে নিবন্ধন করুন।',has_acct:'এই নম্বর আগেই নিবন্ধিত। লগইন করুন।',
+ who:'আপনি কে?',worker_role:'কর্মী',employer_role:'নিয়োগকর্তা',full_name:'পুরো নাম',biz:'ব্যবসা বা নিয়োগকর্তার নাম',skill:'আপনার মূল কাজ',
+ exp:'অভিজ্ঞতা (বছর)',area:'এলাকা বা শহর',etype:'নিয়োগকর্তার ধরন',indiv:'ব্যক্তি',company:'কোম্পানি',back:'ফিরে যান',
+ logout:'লগআউট',profile:'প্রোফাইল',hello:'নমস্কার, {n}',have_acct:'আগেই নিবন্ধিত? লগইন',new_here:'নতুন? নিবন্ধন করুন',
+ err_name:'আপনার নাম লিখুন',err_area:'আপনার এলাকা লিখুন',err_age:'নিবন্ধনের জন্য বয়স ১৮ বা বেশি হতে হবে',
+ my_apps:'আমার আবেদন',applied_tab:'আবেদন',no_apps:'আপনি এখনও কোনো কাজে আবেদন করেননি',st_applied:'অপেক্ষায়',st_accepted:'গৃহীত',st_rejected:'বাছাই হয়নি',
+ jobs_for_you:'আপনার জন্য কাজ',my_jobs:'আমার কাজ',mj_tab:'আমার কাজ',applicants:'আবেদনকারী',no_jobs:'আপনি এখনও কোনো কাজ দেননি',accept:'গ্রহণ',decline:'বাতিল',
+ active_jobs:'চলমান কাজ',waiting:'অপেক্ষায়',recent_app:'নতুন আবেদনকারী',close_job:'কাজ বন্ধ করুন',closed:'বন্ধ',open_s:'খোলা',
+ sample_note:'এই স্ক্রিন চেষ্টা করার জন্য নমুনা আবেদনকারী যোগ করা হয়েছে।',job_accepted:'আপনি বাছাই হয়েছেন:',job_rejected:'আপনি বাছাই হননি:',
+ new_applicant:'নতুন আবেদনকারী:',no_app_yet:'এখনও কোনো আবেদনকারী নেই',acct_ok:'অ্যাকাউন্ট খোলা হয়েছে। স্বাগতম!',logged_out:'আপনি লগআউট হয়েছেন',
+ role_w:'কর্মীর অ্যাকাউন্ট',role_e:'নিয়োগকর্তার অ্যাকাউন্ট',
+ as_post_w:'কাজ শুধু নিয়োগকর্তারা দিতে পারেন। "কাজ খুঁজুন" ট্যাবে খুঁজে আবেদন করতে পারেন।',
+ as_call_w:'নিয়োগকর্তারা অ্যাপের ভেতরেই কর্মীকে কল করেন। কাজে আবেদন করে বাছাইয়ের অপেক্ষা করুন।',
+ as_apply_e:'কর্মীরা আপনার কাজে আবেদন করেন। "আমার কাজ"-এ আবেদনকারীদের দেখে গ্রহণ করুন।'},
+mr:{l_h:'रोजचे काम, सोप्या पद्धतीने',l_p:'तुमच्या भाषेत जवळचे काम शोधा किंवा कुशल लोकांना कामावर घ्या. सुरक्षित, पडताळलेले, सुरू करणे मोफत.',
+ login:'लॉगिन',register:'नोंदणी',create:'खाते उघडा',i_work:'मला काम हवे',i_hire:'मला कामगार हवेत',
+ w_b1:'जवळचे काम शोधा',w_b2:'एका टॅपमध्ये अर्ज',w_b3:'नवीन कामाची सूचना मिळवा',
+ e_b1:'एका मिनिटात काम टाका',e_b2:'अ‍ॅपमध्येच कामगारांना कॉल करा',e_b3:'फक्त पडताळलेले ड्रायव्हर आणि कायदेशीर कामगार',
+ how:'हे कसे चालते',s1:'मोबाइल नंबरने नोंदणी करा',s2:'OTP ने पडताळणी करा',s3:'जवळचे काम शोधा किंवा कामगार घ्या',
+ safe_t:'सर्वांसाठी सुरक्षित आणि कायदेशीर',phone:'मोबाइल नंबर',send_otp:'OTP पाठवा',enter_otp:'६ अंकी OTP टाका',otp_sent:'OTP +91 {p} वर पाठवला',
+ verify:'पडताळा आणि पुढे जा',resend:'OTP पुन्हा पाठवा',resend_in:'{s} सेकंदात पुन्हा पाठवता येईल',otp_demo:'डेमो मोड: तुमचा OTP {c} आहे. खरे अ‍ॅप हा SMS ने पाठवते.',
+ bad_phone:'योग्य १० अंकी मोबाइल नंबर टाका',bad_otp:'चुकीचा OTP. पुन्हा प्रयत्न करा',otp_exp:'OTP ची मुदत संपली. नवीन पाठवा',
+ no_acct:'या नंबरचे खाते नाही. आधी नोंदणी करा.',has_acct:'हा नंबर आधीच नोंदलेला आहे. लॉगिन करा.',
+ who:'तुम्ही कोण आहात?',worker_role:'कामगार',employer_role:'नियोक्ता',full_name:'पूर्ण नाव',biz:'व्यवसाय किंवा नियोक्त्याचे नाव',skill:'तुमचे मुख्य काम',
+ exp:'अनुभव (वर्षे)',area:'परिसर किंवा गाव',etype:'नियोक्त्याचा प्रकार',indiv:'व्यक्ती',company:'कंपनी',back:'मागे',
+ logout:'लॉगआउट',profile:'प्रोफाइल',hello:'नमस्कार, {n}',have_acct:'आधीच नोंदणी केली आहे? लॉगिन',new_here:'नवीन आहात? नोंदणी करा',
+ err_name:'कृपया तुमचे नाव टाका',err_area:'कृपया तुमचा परिसर टाका',err_age:'नोंदणीसाठी वय १८ किंवा जास्त असावे',
+ my_apps:'माझे अर्ज',applied_tab:'अर्ज',no_apps:'तुम्ही अजून कोणत्याही कामासाठी अर्ज केलेला नाही',st_applied:'प्रतीक्षेत',st_accepted:'स्वीकारले',st_rejected:'निवड झाली नाही',
+ jobs_for_you:'तुमच्यासाठी कामे',my_jobs:'माझी कामे',mj_tab:'माझी कामे',applicants:'अर्जदार',no_jobs:'तुम्ही अजून कोणतेही काम टाकलेले नाही',accept:'स्वीकारा',decline:'नाकारा',
+ active_jobs:'चालू कामे',waiting:'प्रतीक्षेत',recent_app:'नवीन अर्जदार',close_job:'काम बंद करा',closed:'बंद',open_s:'खुले',
+ sample_note:'ही स्क्रीन वापरून पाहता यावी म्हणून नमुना अर्जदार जोडले आहेत.',job_accepted:'तुमची निवड झाली:',job_rejected:'तुमची निवड झाली नाही:',
+ new_applicant:'नवीन अर्जदार:',no_app_yet:'अजून अर्जदार नाहीत',acct_ok:'खाते उघडले. स्वागत आहे!',logged_out:'तुम्ही लॉगआउट झालात',
+ role_w:'कामगार खाते',role_e:'नियोक्ता खाते',
+ as_post_w:'काम फक्त नियोक्ते टाकू शकतात. "काम शोधा" टॅबमध्ये शोधून अर्ज करू शकता.',
+ as_call_w:'नियोक्ते अ‍ॅपमध्येच कामगारांना कॉल करतात. कामासाठी अर्ज करा आणि निवडीची वाट पहा.',
+ as_apply_e:'कामगार तुमच्या कामांसाठी अर्ज करतात. "माझी कामे" मध्ये अर्जदार पाहून स्वीकारा.'}
+};
+for(const l in NEWS)Object.assign(S[l],NEWS[l]);
+
+Object.assign(S.en,{as_apply:'To apply: open Find work, pick a job, tap Apply, and confirm you are 18 or older.'});
+Object.assign(S.hi,{as_apply:'आवेदन के लिए: "काम खोजें" खोलें, काम चुनें, "आवेदन करें" दबाएँ और 18+ की पुष्टि करें।'});
+Object.assign(S.te,{as_apply:'దరఖాస్తుకు: "పని వెతకండి" తెరవండి, పని ఎంచుకోండి, "దరఖాస్తు చేయండి" నొక్కి 18+ నిర్ధారించండి.'});
+Object.assign(S.ta,{as_apply:'விண்ணப்பிக்க: "வேலை தேடுங்கள்" திறந்து, வேலையைத் தேர்ந்து, "விண்ணப்பிக்கவும்" அழுத்தி 18+ உறுதி செய்யுங்கள்.'});
+Object.assign(S.kn,{as_apply:'ಅರ್ಜಿಗೆ: "ಕೆಲಸ ಹುಡುಕಿ" ತೆರೆಯಿರಿ, ಕೆಲಸ ಆರಿಸಿ, "ಅರ್ಜಿ ಹಾಕಿ" ಒತ್ತಿ 18+ ಖಚಿತಪಡಿಸಿ.'});
+Object.assign(S.bn,{as_apply:'আবেদনের জন্য: "কাজ খুঁজুন" খুলুন, কাজ বেছে "আবেদন করুন" চাপুন এবং ১৮+ নিশ্চিত করুন।'});
+Object.assign(S.mr,{as_apply:'अर्जासाठी: "काम शोधा" उघडा, काम निवडा, "अर्ज करा" दाबा आणि १८+ पक्के करा.'});
+
+Object.assign(S.en,{console:'Employer console',say_work:'Say the work you want',needs_action:'Needs your action'});
+Object.assign(S.hi,{console:'नियोक्ता पैनल',say_work:'बोलकर काम खोजें',needs_action:'आपके निर्णय का इंतज़ार'});
+Object.assign(S.te,{console:'యజమాని ప్యానెల్',say_work:'మాట్లాడి పని వెతకండి',needs_action:'మీ నిర్ణయం కోసం'});
+Object.assign(S.ta,{console:'வேலை கொடுப்பவர் பலகை',say_work:'பேசி வேலை தேடுங்கள்',needs_action:'உங்கள் முடிவுக்காக'});
+Object.assign(S.kn,{console:'ಉದ್ಯೋಗದಾತ ಪ್ಯಾನೆಲ್',say_work:'ಮಾತನಾಡಿ ಕೆಲಸ ಹುಡುಕಿ',needs_action:'ನಿಮ್ಮ ನಿರ್ಧಾರಕ್ಕಾಗಿ'});
+Object.assign(S.bn,{console:'নিয়োগকর্তা প্যানেল',say_work:'বলে কাজ খুঁজুন',needs_action:'আপনার সিদ্ধান্তের অপেক্ষায়'});
+Object.assign(S.mr,{console:'नियोक्ता पॅनेल',say_work:'बोलून काम शोधा',needs_action:'तुमच्या निर्णयाची वाट'});
+
+const CATS=[
+ {id:'plumber',ic:'🔧',n:{en:'Plumber',hi:'प्लंबर',te:'ప్లంబర్',ta:'பிளம்பர்',kn:'ಪ್ಲಂಬರ್',bn:'প্লাম্বার',mr:'प्लंबर'}},
+ {id:'cook',ic:'🍳',n:{en:'Cook',hi:'रसोइया',te:'వంటవాడు',ta:'சமையல்காரர்',kn:'ಅಡುಗೆಯವರು',bn:'রাঁধুনি',mr:'स्वयंपाकी'}},
+ {id:'chef',ic:'👨‍🍳',n:{en:'Chef',hi:'शेफ',te:'చెఫ్',ta:'செஃப்',kn:'ಷೆಫ್',bn:'শেফ',mr:'शेफ'}},
+ {id:'driver',ic:'🚚',n:{en:'Driver',hi:'ड्राइवर',te:'డ్రైవర్',ta:'ஓட்டுநர்',kn:'ಚಾಲಕ',bn:'ড্রাইভার',mr:'ड्रायव्हर'}},
+ {id:'electrician',ic:'💡',n:{en:'Electrician',hi:'इलेक्ट्रीशियन',te:'ఎలక్ట్రీషియన్',ta:'எலக்ட்ரீஷியன்',kn:'ಎಲೆಕ್ಟ್ರಿಷಿಯನ್',bn:'ইলেকট্রিশিয়ান',mr:'इलेक्ट्रिशियन'}},
+ {id:'mason',ic:'🧱',n:{en:'Mason',hi:'राजमिस्त्री',te:'తాపీ మేస్త్రి',ta:'கொத்தனார்',kn:'ಮೇಸ್ತ್ರಿ',bn:'রাজমিস্ত্রি',mr:'गवंडी'}},
+ {id:'painter',ic:'🎨',n:{en:'Painter',hi:'पेंटर',te:'పెయింటర్',ta:'பெயிண்டர்',kn:'ಪೇಂಟರ್',bn:'রংমিস্ত্রি',mr:'पेंटर'}},
+ {id:'carpenter',ic:'🪚',n:{en:'Carpenter',hi:'बढ़ई',te:'వడ్రంగి',ta:'தச்சர்',kn:'ಬಡಗಿ',bn:'কাঠমিস্ত্রি',mr:'सुतार'}},
+ {id:'loader',ic:'📦',n:{en:'Helper',hi:'मज़दूर',te:'కూలీ',ta:'கூலி',kn:'ಕೂಲಿ',bn:'মজুর',mr:'मजूर'}},
+ {id:'cleaner',ic:'🧹',n:{en:'Cleaner',hi:'सफाईकर्मी',te:'శుభ్రత పనివారు',ta:'துப்புரவு',kn:'ಸ್ವಚ್ಛತೆ',bn:'পরিষ্কারক',mr:'सफाई कामगार'}}
+];
+
+/* Sample data. In a real build these come from your server. */
+const WORKERS=[
+ {id:1,name:'Ramesh Kumar',cat:'plumber',km:0.8,r:4.8,yrs:6,v:1},{id:2,name:'Suresh Reddy',cat:'plumber',km:1.6,r:4.5,yrs:4,v:1},
+ {id:3,name:'Imran Sheikh',cat:'plumber',km:2.9,r:4.2,yrs:2,v:0},{id:4,name:'Lakshmi Devi',cat:'cook',km:1.2,r:4.9,yrs:8,v:1},
+ {id:5,name:'Anil Rao',cat:'chef',km:3.4,r:4.7,yrs:10,v:1},{id:6,name:'Mohan Das',cat:'driver',km:2.1,r:4.6,yrs:7,v:1},
+ {id:7,name:'Prakash Yadav',cat:'electrician',km:1.9,r:4.4,yrs:5,v:1},{id:8,name:'Ganesh Naik',cat:'mason',km:2.6,r:4.3,yrs:9,v:0},
+ {id:9,name:'Salma Begum',cat:'painter',km:3.1,r:4.6,yrs:6,v:1},{id:10,name:'Raju Singh',cat:'carpenter',km:4.0,r:4.5,yrs:12,v:1},
+ {id:11,name:'Kavitha M',cat:'cleaner',km:1.0,r:4.4,yrs:3,v:1},{id:12,name:'Bhaskar P',cat:'loader',km:1.4,r:4.1,yrs:2,v:0}
+];
+const SEED_JOBS=[
+ {id:101,title:'Fix pipes in apartment',cat:'plumber',type:'daily',pay:900,veh:0,drink:1,loc:'Market Road',need:2,emp:'Sri Sai Builders',dv:0},
+ {id:102,title:'Wedding cook',cat:'cook',type:'daily',pay:1200,veh:0,drink:1,loc:'Station Road',need:3,emp:'Sharma Caterers',dv:0},
+ {id:103,title:'Delivery driver',cat:'driver',type:'weekly',pay:800,veh:1,drink:1,loc:'Main Bazaar',need:1,emp:'FastMove Logistics',dv:1},
+ {id:104,title:'Wall painting',cat:'painter',type:'contract',pay:1000,veh:0,drink:0,loc:'Park Colony',need:4,emp:'Home Care Services',dv:0},
+ {id:105,title:'Site helper',cat:'loader',type:'daily',pay:600,veh:0,drink:1,loc:'New Layout',need:10,emp:'Raj Constructions',dv:0},
+ {id:106,title:'Restaurant chef',cat:'chef',type:'weekly',pay:1500,veh:0,drink:1,loc:'Lake View',need:1,emp:'Spice Garden',dv:0}
+];
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const P={
+ home:'<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/>',
+ search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+ briefcase:'<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M3 13h18"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ chat:'<path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M8 9.5h8M8 12.5h5"/>',
+ bell:'<path d="M6 16.5V11a6 6 0 1 1 12 0v5.5l1.5 2h-15z"/><path d="M10 21h4"/>',
+ scale:'<path d="M12 4v16M7 20h10M5 7h14"/><path d="m5 7-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/>',
+ mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',
+ phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+ phoneoff:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/><path d="M3 3l18 18"/>',
+ speaker:'<path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
+ pin:'<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+ shield:'<path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/><path d="m9 12 2.2 2.2L15 10"/>',
+ check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+ x:'<path d="M6 6l12 12M18 6 6 18"/>',
+ lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+ back:'<path d="M15 5l-7 7 7 7"/>',
+ logout:'<path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"/><path d="m16 8 4 4-4 4M20 12H9"/>',
+ tool:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.1l-5.8 5.8a2 2 0 0 0 2.8 2.8l5.8-5.8a4 4 0 0 0 5.1-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
+ building:'<path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16"/><path d="M14 10h5a1 1 0 0 1 1 1v10M3 21h18M8 8h2M8 12h2M8 16h2"/>'
+};
+const ic=n=>`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`;
+const store={
+  get(k,d){try{const v=localStorage.getItem('kc_'+k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('kc_'+k,JSON.stringify(v))}catch(e){}}
+};
+const guess=(navigator.language||'en').slice(0,2);
+const state={
+  lang:store.get('lang',LANGS[guess]?guess:'en'), view:'landing', mode:'worker', cat:'', q:'',
+  jobs:store.get('jobs',SEED_JOBS), apps:store.get('apps2',[]), notifs:store.get('notifs',[]),
+  users:store.get('users',[]), user:null, auth:null, prev:'landing',
+  chat:[], call:null, modal:null
+};
+const t=(k,v)=>{let s=(S[state.lang]&&S[state.lang][k])||S.en[k]||k;if(v)for(const x in v)s=s.replace('{'+x+'}',v[x]);return s};
+const cname=id=>{const c=CATS.find(x=>x.id===id);return c?(c.n[state.lang]||c.n.en):id};
+const cicon=id=>(CATS.find(x=>x.id===id)||{ic:'🛠️'}).ic;
+function matchCat(q){
+  q=(q||'').trim().toLowerCase(); if(q.length<2)return null;
+  for(const c of CATS){
+    const names=[c.id,...Object.values(c.n)].map(n=>n.toLowerCase());
+    if(names.some(n=>q.includes(n)||n.includes(q)))return c.id;
+  }
+  return null;
+}
+function toast(msg){const el=$('#toast');el.textContent=msg;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2600)}
+
+/* ---------- voice in and out (browser Web Speech API) ---------- */
+function speak(text){
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);u.lang=LANGS[state.lang].sr;speechSynthesis.speak(u);
+}
+function listen(btn,onText){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast(t('no_voice'));return}
+  const r=new SR();r.lang=LANGS[state.lang].sr;r.interimResults=false;
+  btn.classList.add('on');toast(t('listening'));
+  r.onresult=e=>onText(e.results[0][0].transcript);
+  r.onerror=()=>toast(t('mic_denied'));
+  r.onend=()=>btn.classList.remove('on');
+  try{r.start()}catch(e){btn.classList.remove('on')}
+}
+
+/* ---------- notifications (each account sees its own) ---------- */
+function mine(){const p=state.user&&state.user.phone;return state.notifs.filter(n=>n.to===p)}
+function addNotif(text,to){
+  to=to||(state.user&&state.user.phone);if(!to)return;
+  state.notifs.unshift({id:Date.now()+Math.random(),text,to,time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),read:0});
+  state.notifs=state.notifs.slice(0,60);store.set('notifs',state.notifs);
+  try{if(state.user&&to===state.user.phone&&'Notification' in window&&Notification.permission==='granted')new Notification('Kaam Connect',{body:text})}catch(e){}
+  updateBadge();
+}
+function updateBadge(){const b=$('#bn');if(!b)return;const n=mine().filter(x=>!x.read).length;b.hidden=!n;b.textContent=n}
+
+/* ---------- views ---------- */
+const V={};
+/* ---------- home screens, one per role ---------- */
+const myApps=()=>state.apps.filter(a=>a.wphone===state.user.phone);
+const myJobs=()=>state.jobs.filter(j=>j.owner===state.user.phone);
+const myJobApps=()=>{const ids=myJobs().map(j=>j.id);return state.apps.filter(a=>ids.includes(a.jobId))};
+const statusOf=s=>s==='accepted'?['ok','st_accepted']:s==='rejected'?['no','st_rejected']:['wait','st_applied'];
+const jobRow=(icon,title,sub,cls,label)=>`<button class="jrow" data-act="open" data-v="${cls==='w'?'apps':'myjobs'}"><span class="av2">${icon}</span><span class="jt"><b>${esc(title)}</b><span class="sub">${esc(sub)}</span></span>${label}</button>`;
+/* WORKER: warm and voice-first. One big microphone, big cards, few choices. */
+const homeW=()=>{
+  const u=state.user,mine=myApps().sort((x,y)=>y.id-x.id),open=state.jobs.filter(j=>!j.closed);
+  const list=open.filter(j=>j.cat===u.skill).concat(open.filter(j=>j.cat!==u.skill)).slice(0,3);
+  const strip=mine.slice(0,3).map(a=>{const j=state.jobs.find(x=>x.id===a.jobId);if(!j)return '';const [c,k]=statusOf(a.status);
+    return jobRow(cicon(j.cat),j.title,j.emp,'w',`<span class="st ${c}">${esc(t(k))}</span>`)}).join('');
+  return `<div class="pills"><span class="pill">${ic('tool')}${esc(t('role_w'))}</span><span class="pill">${ic('pin')}${esc(u.area)}</span><span class="pill">${cicon(u.skill)} ${esc(cname(u.skill))}</span></div>
+<h1 class="hello">${esc(t('hello',{n:u.name.split(' ')[0]}))}</h1>
+<form id="hf" class="voicehero glass" novalidate><p>${esc(t('say_work'))}</p>
+ <button type="button" class="bigmic" data-act="hmic" aria-label="${esc(t('tap_speak'))}">${ic('mic')}</button>
+ <div class="searchbar"><input id="hq" type="search" autocomplete="off" placeholder="${esc(t('search_ph'))}" aria-label="${esc(t('search_ph'))}"><button class="mic" type="submit" aria-label="${esc(t('find_work'))}">${ic('search')}</button></div></form>
+<h2>${esc(t('jobs_for_you'))}</h2>${list.map(jobCard).join('')}
+${strip?`<h2>${esc(t('my_apps'))}</h2><div class="joblist glass">${strip}</div>`:''}
+<div class="tiles" style="margin-top:22px">
+ <button class="tile" data-act="open" data-v="chat"><span class="ic">${ic('chat')}</span>${esc(t('assistant'))}</button>
+ <button class="tile" data-act="open" data-v="rules"><span class="ic">${ic('scale')}</span>${esc(t('rules'))}</button>
+</div>
+<h2>${esc(t('category'))}</h2>
+<div class="catgrid">${CATS.map(c=>`<button class="cat" data-act="catgo" data-v="${c.id}"><span>${c.ic}</span>${esc(cname(c.id))}</button>`).join('')}</div>`;
+};
+/* EMPLOYER: a cool business dashboard. Numbers first, then what needs a decision, then your jobs and nearby workers. */
+const homeE=()=>{
+  const u=state.user,jobs=myJobs(),apps=myJobApps(),wait=apps.filter(a=>a.status==='applied'),acc=apps.filter(a=>a.status==='accepted');
+  const openJ=jobs.filter(j=>!j.closed),needTotal=openJ.reduce((n,j)=>n+(+j.need||0),0);
+  const near=WORKERS.slice().sort((a,b)=>a.km-b.km).slice(0,6);
+  const stat=(n,l,x)=>`<button class="stat glass ${x||''}" data-act="open" data-v="myjobs"><b>${n}</b><span>${esc(l)}</span></button>`;
+  return `<div class="pills"><span class="pill">${ic('building')}${esc(t('console'))}</span><span class="pill">${ic('pin')}${esc(u.area)}</span></div>
+<h1 class="hello">${esc(u.biz)}</h1>
+<div class="stats">${stat(openJ.length,t('active_jobs'))}${stat(wait.length,t('waiting'),wait.length?'alert':'')}${stat(acc.length,t('st_accepted'))}${stat(needTotal,t('need'))}</div>
+<div class="cta" style="margin-top:14px"><button class="btn hi" data-act="open" data-v="post">${ic('plus')} ${esc(t('post_job'))}</button><button class="btn" data-act="open" data-v="find">${ic('search')} ${esc(t('find_worker'))}</button></div>
+${wait.length?`<h2>${esc(t('needs_action'))}</h2><div class="card appl-card">${wait.slice(0,3).map(a=>applicantRow(a,true)).join('')}</div>`:''}
+<h2>${esc(t('my_jobs'))}</h2>
+${jobs.length?`<div class="joblist glass">${jobs.slice(0,4).map(j=>{const n=state.apps.filter(a=>a.jobId===j.id).length;
+  return jobRow(cicon(j.cat),j.title,`₹${j.pay} · ${t('applicants')} ${n}`,'e',`<span class="st ${j.closed?'no':'ok'}">${esc(t(j.closed?'closed':'open_s'))}</span>`)}).join('')}</div>`:`<p class="note">${esc(t('no_jobs'))}</p>`}
+<h2>${esc(t('nearby'))}</h2>
+<div class="hscroll">${near.map(w=>`<article class="mini glass"><div class="head"><span class="av2">${cicon(w.cat)}</span><div class="who"><b>${esc(w.name)}</b><div class="sub">${esc(cname(w.cat))} · ${w.km} ${esc(t('away'))}</div></div></div>
+ <button class="btn call" data-act="call" data-v="${w.id}">${ic('phone')} ${esc(t('call_app'))}</button></article>`).join('')}</div>`;
+};
+V.home=()=>state.user.role==='employer'?homeE():homeW();
+
+V.find=()=>`<h1 class="hello">${esc(t(state.user.role==='employer'?'find_worker':'find_work'))}</h1>
+<div class="searchbar"><input id="q" type="search" autocomplete="off" placeholder="${esc(t('search_ph'))}" value="${esc(state.q)}" aria-label="${esc(t('search_ph'))}">
+ <button class="mic" data-act="mic" aria-label="${esc(t('tap_speak'))}" title="${esc(t('tap_speak'))}">${ic('mic')}</button></div>
+<div class="chips"><button class="chip ${!state.cat?'on':''}" data-act="cat" data-v="">${esc(t('all'))}</button>
+ ${CATS.map(c=>`<button class="chip ${state.cat===c.id?'on':''}" data-act="cat" data-v="${c.id}">${c.ic} ${esc(cname(c.id))}</button>`).join('')}</div>
+<div id="res"></div>`;
+
+/* worker: my applications */
+V.apps=()=>{
+  const mine=myApps().sort((x,y)=>y.id-x.id);
+  const cards=mine.map(a=>{
+    const j=state.jobs.find(x=>x.id===a.jobId);if(!j)return '';
+    const [cls,key]=statusOf(a.status);
+    return `<article class="card"><div class="av">${cicon(j.cat)}</div><div class="grow"><h3>${esc(j.title)}</h3>
+     <p class="sub">${esc(j.emp)} · ${ic('pin')} ${esc(j.loc)}</p><div class="pay">₹${esc(j.pay)} <span class="sub">${esc(t('per_day'))}</span></div>
+     <span class="st ${cls}">${esc(t(key))}</span></div></article>`}).join('');
+  return `<h1 class="hello">${esc(t('my_apps'))}</h1>`+(cards||`<p class="empty">${esc(t('no_apps'))}</p><div class="row"><button class="btn hi" data-act="open" data-v="find">${ic('search')} ${esc(t('find_work'))}</button></div>`);
+};
+
+/* employer: applicants and my jobs */
+function applicantRow(a,withJob){
+  const j=state.jobs.find(x=>x.id===a.jobId),[cls,key]=statusOf(a.status);
+  return `<div class="arow"><div class="head"><span class="av2">${cicon(a.wcat)}</span><div class="who"><b>${esc(a.wname)}</b>${withJob&&j?` <span class="sub">· ${esc(j.title)}</span>`:''}
+   <div class="sub">${esc(cname(a.wcat))} <span class="st ${cls}">${esc(t(key))}</span></div></div></div>
+   ${a.status==='applied'?`<button class="btn hi" data-act="decide" data-i="${a.id}" data-v="accepted">${ic('check')} ${esc(t('accept'))}</button>
+   <button class="btn ghost" data-act="decide" data-i="${a.id}" data-v="rejected">${ic('x')} ${esc(t('decline'))}</button>`:''}
+   <button class="btn call" data-act="callapp" data-v="${a.id}" aria-label="${esc(t('call_app'))}">${ic('phone')}</button></div>`;
+}
+function myJobCard(j){
+  const apps=state.apps.filter(a=>a.jobId===j.id);
+  return `<article class="card"><div class="av">${cicon(j.cat)}</div><div class="grow"><h3>${esc(j.title)}</h3>
+   <p class="sub">${ic('pin')} ${esc(j.loc)} · 👷 ${esc(j.need)}</p>
+   <div class="pay">₹${esc(j.pay)} <span class="sub">${esc(t('per_day'))}</span> <span class="st ${j.closed?'no':'ok'}">${esc(t(j.closed?'closed':'open_s'))}</span></div></div>
+   <div class="appl"><h2 style="margin:4px 0 0">${esc(t('applicants'))} · ${apps.length}</h2>
+   ${apps.length?apps.map(a=>applicantRow(a,false)).join(''):`<p class="sub">${esc(t('no_app_yet'))}</p>`}
+   ${j.closed?'':`<button class="btn ghost" style="flex:none" data-act="closejob" data-v="${j.id}">${esc(t('close_job'))}</button>`}</div></article>`;
+}
+V.myjobs=()=>{
+  const jobs=myJobs();
+  if(!jobs.length)return `<h1 class="hello">${esc(t('my_jobs'))}</h1><p class="empty">${esc(t('no_jobs'))}</p><div class="row"><button class="btn hi" data-act="open" data-v="post">${ic('plus')} ${esc(t('post_job'))}</button></div>`;
+  return `<h1 class="hello">${esc(t('my_jobs'))}</h1>${jobs.map(myJobCard).join('')}${myJobApps().some(a=>a.sample)?`<p class="note">${esc(t('sample_note'))}</p>`:''}`;
+};
+
+/* tabs and render: the interface depends on the signed-in role */
+const PUBLIC=['landing','login','register','rules'];
+const ALLOWED={worker:['home','find','apps','chat','rules','alerts','profile'],employer:['home','find','post','myjobs','chat','rules','alerts','profile']};
+const TABS_W=[['home','home','home'],['find','search','find_work'],['apps','briefcase','applied_tab'],['chat','chat','assistant']];
+const TABS_E=[['home','home','home'],['post','plus','post_job'],['myjobs','briefcase','mj_tab'],['find','search','find_worker'],['chat','chat','assistant']];
+function drawHeader(){
+  const u=state.user;
+  $('#hdr').className='wrap'+(u?' in':'');
+  $('#hdr').innerHTML=`<div class="logo"><span class="mark" aria-hidden="true"></span><span>Kaam<b>Connect</b></span></div>
+  <select id="lang" aria-label="Language">${Object.entries(LANGS).map(([k,l])=>`<option value="${k}">${l.n}</option>`).join('')}</select>`+
+  (u?`<button class="hbtn" data-act="open" data-v="rules" aria-label="${esc(t('rules'))}">${ic('scale')}</button>
+  <button class="hbtn" data-act="open" data-v="alerts" aria-label="${esc(t('alerts'))}">${ic('bell')}<span id="bn" class="badge-n" hidden></span></button>
+  <button class="hbtn av" data-act="open" data-v="profile" aria-label="${esc(t('profile'))}">${esc(u.name.trim()[0].toUpperCase())}</button>`
+  :`<button class="hbtn txt" data-act="open" data-v="login">${esc(t('login'))}</button>`);
+  $('#lang').value=state.lang;
+}
+function render(){
+  document.documentElement.lang=state.lang;
+  const u=state.user;
+  document.documentElement.dataset.role=u?u.role:'';
+  if(!u&&!PUBLIC.includes(state.view))state.view='landing';
+  if(u&&!ALLOWED[u.role].includes(state.view))state.view='home';
+  if(u)state.mode=u.role==='employer'?'worker':'job';
+  drawHeader();
+  $('#app').innerHTML=V[state.view]();
+  const tabs=u?(u.role==='employer'?TABS_E:TABS_W):[],nav=document.querySelector('nav.tabs');
+  nav.hidden=!u;
+  $('#tabs').style.gridTemplateColumns=`repeat(${tabs.length||1},1fr)`;
+  $('#tabs').innerHTML=tabs.map(([v,i,l])=>`<button class="${state.view===v?'on':''}" data-act="tab" data-v="${v}"><span>${ic(i)}</span>${esc(t(l))}</button>`).join('');
+  if(state.view==='find')fillResults();
+  if(state.view==='chat')drawChat();
+  if(state.view==='alerts'){mine().forEach(n=>n.read=1);store.set('notifs',state.notifs)}
+  updateBadge();
+}
+
+function workerCard(w){return `<article class="card"><div class="av">${cicon(w.cat)}</div>
+ <div class="grow"><h3>${esc(w.name)}${w.v?` <span class="badge">${ic('shield')}${esc(t('verified'))}</span>`:''}</h3>
+ <p class="sub">${esc(cname(w.cat))} · <span class="star">★</span> ${w.r} · ${w.yrs} yr</p><p class="sub">${ic('pin')} ${w.km} ${esc(t('away'))}</p></div>
+ <div class="actions"><button class="btn call" data-act="call" data-v="${w.id}">${ic('phone')} ${esc(t('call_app'))}</button></div></article>`}
+
+function jobCard(j){
+  const done=state.user&&state.apps.some(a=>a.jobId===j.id&&a.wphone===state.user.phone);
+  const spoken=`${j.title}. ${j.pay} ${t('per_day')}. ${j.loc}`;
+  return `<article class="card"><div class="av">${cicon(j.cat)}</div>
+ <div class="grow"><h3>${esc(j.title)}</h3><p class="sub">${esc(j.emp)} · ${ic('pin')} ${esc(j.loc)}</p>
+ <div class="pay">₹${esc(j.pay)} <span class="sub">${esc(t('per_day'))}</span></div>
+ <div class="tags"><span class="tag">${esc(t(j.type))}</span><span class="tag">👷 ${esc(j.need)}</span>
+ ${j.veh?`<span class="tag">🚚 ${esc(t('vehicle'))}${j.dv?' ✔':''}</span>`:''}${j.drink?`<span class="tag">🥤 ${esc(t('drinks').split('/')[0].trim())}</span>`:''}</div></div>
+ <div class="actions"><button class="btn alt" data-act="say" data-v="${esc(spoken)}" aria-label="${esc(t('read'))}">${ic('speaker')}</button>
+ <button class="btn ${done?'ghost':'hi'}" data-act="apply" data-v="${j.id}" ${done?'disabled':''}>${esc(done?t('applied'):t('apply'))}</button></div></article>`}
+
+function fillResults(){
+  const el=$('#res');if(!el)return;
+  const q=state.q.trim().toLowerCase(), mc=matchCat(q);
+  const hit=(catId,text)=>(!state.cat||catId===state.cat)&&(!q||(mc?catId===mc:text.toLowerCase().includes(q)));
+  let html='';
+  if(state.mode==='worker'){
+    const list=WORKERS.filter(w=>hit(w.cat,w.name)).sort((a,b)=>a.km-b.km);
+    html=list.length?`<h2>${esc(t('nearby'))} · ${list.length}</h2>`+list.map(workerCard).join(''):`<p class="empty">${esc(t('no_results'))}</p>`;
+  }else{
+    const list=state.jobs.filter(j=>!j.closed&&hit(j.cat,j.title));
+    html=list.length?list.map(jobCard).join(''):`<p class="empty">${esc(t('no_results'))}</p>`;
+  }
+  el.innerHTML=html;
+}
+
+V.post=()=>`<h1 class="hello">${esc(t('post_job'))}</h1>
+<form id="pf" novalidate>
+ <div class="f"><label class="l" for="f_title">${esc(t('job_name'))}</label><input type="text" id="f_title" autocomplete="off"></div>
+ <div class="f"><label class="l" for="f_cat">${esc(t('category'))}</label><select id="f_cat">${CATS.map(c=>`<option value="${c.id}">${c.ic} ${esc(cname(c.id))}</option>`).join('')}</select></div>
+ <div class="f"><label class="l" for="f_type">${esc(t('job_type'))}</label><select id="f_type"><option value="daily">${esc(t('daily'))}</option><option value="weekly">${esc(t('weekly'))}</option><option value="contract">${esc(t('contract'))}</option></select></div>
+ <div class="f"><label class="l" for="f_pay">${esc(t('pay'))}</label><input type="number" id="f_pay" inputmode="numeric" min="0"></div>
+ <div class="f"><label class="l" for="f_need">${esc(t('need'))}</label><input type="number" id="f_need" inputmode="numeric" min="1" value="1"></div>
+ <div class="f"><label class="l" for="f_loc">${esc(t('place'))}</label><input type="text" id="f_loc" autocomplete="off" value="${esc(state.user?state.user.area||'':'')}"></div>
+ <div class="f"><span class="l" style="display:block;font-weight:700;margin-bottom:6px">🚚 ${esc(t('vehicle'))}</span><div class="yn">
+  <label><input type="radio" name="veh" value="1"><span>${esc(t('yes'))}</span></label><label><input type="radio" name="veh" value="0" checked><span>${esc(t('no'))}</span></label></div></div>
+ <div class="f" id="dvbox" hidden><label class="check"><input type="checkbox" id="f_dv"><span>${esc(t('driver_v'))}</span></label></div>
+ <div class="f"><span class="l" style="display:block;font-weight:700;margin-bottom:6px">🥤 ${esc(t('drinks'))}</span><div class="yn">
+  <label><input type="radio" name="drk" value="1" checked><span>${esc(t('yes'))}</span></label><label><input type="radio" name="drk" value="0"><span>${esc(t('no'))}</span></label></div></div>
+ <div class="f"><label class="check"><input type="checkbox" id="f_agree"><span>${esc(t('agree'))}<br><a href="#" data-act="open" data-v="rules">${ic('scale')} ${esc(t('rules'))}</a></span></label></div>
+ <button class="btn hi" style="width:100%" type="submit">${esc(t('submit'))}</button>
+</form>`;
+
+V.chat=()=>`<div class="chathead"><span class="botav">${ic('chat')}</span><div><b>Kaam Mitra</b><div class="sub"><span class="dot"></span>${esc(t('assistant'))}</div></div></div>
+<div class="chat" id="chatlist"></div>
+<div class="chips">${CHIPS().map(([k,l])=>`<button class="chip" data-act="chip" data-v="${esc(k)}" data-l="${esc(l)}">${esc(l)}</button>`).join('')}</div>
+<div class="searchbar"><input id="ci" type="text" autocomplete="off" placeholder="${esc(t('ask_ph'))}" aria-label="${esc(t('ask_ph'))}">
+ <button class="mic" data-act="cmic" aria-label="${esc(t('tap_speak'))}">${ic('mic')}</button></div>
+<div class="row"><button class="btn" data-act="csend">${esc(t('send'))}</button></div>`;
+
+V.rules=()=>`<h1 class="hello">${esc(t('rules'))}</h1>
+${[['⛔','t1'],['✅','t2'],['🪪','t3'],['💰','t4']].map(([i,k])=>`<div class="rule"><span class="ic">${i}</span><div>${esc(t(k))}</div></div>`).join('')}
+<div class="row"><button class="btn" data-act="say" data-v="${esc([t('t1'),t('t2'),t('t3'),t('t4')].join(' '))}">${ic('speaker')} ${esc(t('read'))}</button></div>${state.user?'':`<div class="row"><button class="btn ghost" data-act="goto" data-v="${state.prev||'landing'}">${ic('back')} ${esc(t('back'))}</button></div>`}`;
+
+V.alerts=()=>`<h1 class="hello">${esc(t('alerts'))}</h1>
+${mine().length?mine().map(n=>`<div class="rule"><span class="ic">${ic('bell')}</span><div>${esc(n.text)}<p class="sub">${esc(n.time)}</p></div></div>`).join(''):`<p class="empty">${esc(t('empty_alerts'))}</p>`}
+${('Notification' in window&&Notification.permission==='default')?`<div class="row"><button class="btn ghost" data-act="push">${ic('bell')} ${esc(t('enable_push'))}</button></div>`:''}`;
+
+/* ---------- assistant: friendly, rule based. Plug a language model in at ASSISTANT_API ---------- */
+/* const ASSISTANT_API='https://your-server.example/assistant';  // POST {text, lang}, receive {reply} */
+const KW={
+ apply:['apply','application','आवेदन','अप्लाई','దరఖాస్తు','விண்ணப்ப','ಅರ್ಜಿ','আবেদন','अर्ज'],
+ rules:['rule','terms','child','legal','नियम','నియమ','விதி','ನಿಯಮ','নিয়ম'],
+ post:['post a job','post job','hire','काम डाल','పోస్ట్','பதிவிட','ಕೆಲಸ ಹಾಕಿ','কাজ দিন','काम टाका'],
+ call:['call','phone','कॉल','फोन','కాల్','அழை','ಕರೆ','কল'],
+ pay:['pay','salary','wage','rate','मजदूरी','वेतन','జీతం','వేతనం','சம்பளம்','ಸಂಬಳ','মজুরি','मजुरी','किती पैसे'],
+ alerts:['alert','notif','सूचना','సమాచారం','அறிவிப்பு','ಸೂಚನೆ','বার্তা']
+};
+const WORDS={
+ greet:['hi','hii','hello','hey','hola','namaste','नमस्ते','నమస్తే','வணக்கம்','ನಮಸ್ಕಾರ','নমস্কার','नमस्कार'],
+ thanks:['thanks','thank','thx','धन्यवाद','शुक्रिया','ధన్యవాదాలు','நன்றி','ಧನ್ಯವಾದ','ধন্যবাদ','आभार']
+};
+const CHIPS=()=>{const u=state.user;
+  if(u&&u.role==='worker')return [['cat:'+u.skill,cname(u.skill)],['apply',t('ch_apply')],['pay',t('ch_pay')],['rules',t('rules')]];
+  return [['cat:plumber',cname('plumber')],['post',t('post_job')],['call',t('ch_call')],['pay',t('ch_pay')],['rules',t('rules')]]};
+const anyIn=(q,list)=>list.some(w=>q.includes(w));
+const tokens=q=>q.split(/[\s,.!?।]+/).filter(Boolean);
+function avgPay(cat){const l=state.jobs.filter(j=>j.cat===cat);return l.length?Math.round(l.reduce((a,j)=>a+j.pay,0)/l.length):0}
+const isE=()=>!!(state.user&&state.user.role==='employer');
+function foundReply(cat){
+  const n=isE()?WORKERS.filter(w=>w.cat===cat).length:state.jobs.filter(j=>j.cat===cat&&!j.closed).length;
+  return{text:t('as_found',{c:cname(cat),n}),acts:[isE()?{label:t('find_worker'),v:'find',cat}:{label:t('find_work'),v:'find',cat}]};
+}
+function payReply(cat){const p=avgPay(cat);return p?{text:t('as_pay',{c:cname(cat),p}),acts:[isE()?{label:t('find_worker'),v:'find',cat}:{label:t('find_work'),v:'find',cat}]}:foundReply(cat)}
+function intentReply(k){
+  state.ctx='';
+  switch(k){
+   case 'greet':return{text:t('as_greet')};
+   case 'thanks':return{text:t('as_thanks')};
+   case 'apply':return isE()?{text:t('as_apply_e'),acts:[{label:t('my_jobs'),v:'myjobs'}]}:{text:t('as_apply'),acts:[{label:t('find_work'),v:'find'}]};
+   case 'call':return isE()?{text:t('as_call'),acts:[{label:t('find_worker'),v:'find'}]}:{text:t('as_call_w'),acts:[{label:t('find_work'),v:'find'}]};
+   case 'post':return isE()?{text:t('as_post'),acts:[{label:t('post_job'),v:'post'}]}:{text:t('as_post_w'),acts:[{label:t('find_work'),v:'find'}]};
+   case 'rules':return{text:[t('t1'),t('t2'),t('t3'),t('t4')].join(' '),acts:[{label:t('rules'),v:'rules'}]};
+   case 'alerts':return{text:t('as_alerts'),acts:[{label:t('alerts'),v:'alerts'}]};
+   case 'pay':state.ctx='pay';return{text:t('as_pay_ask')};
+  }
+  if(k.startsWith('cat:'))return foundReply(k.slice(4));
+  return{text:t('as_default')};
+}
+function botReply(text){
+  const q=text.toLowerCase().trim(), tk=tokens(q), mc=matchCat(q);
+  if(tk.length&&tk.length<=3&&tk.some(w=>WORDS.greet.includes(w)))return intentReply('greet');
+  if(anyIn(q,WORDS.thanks))return intentReply('thanks');
+  if(anyIn(q,KW.pay)){if(mc){state.ctx='';return payReply(mc)}return intentReply('pay')}
+  if(state.ctx==='pay'&&mc){state.ctx='';return payReply(mc)}
+  for(const k of ['rules','apply','post','call','alerts'])if(anyIn(q,KW[k]))return intentReply(k);
+  if(mc){state.ctx='';return foundReply(mc)}
+  state.ctx='';return{text:t('as_default')};
+}
+function drawChat(){
+  if(!state.chat.length)state.chat.push({who:'bot',...intentReply('greet')});
+  const el=$('#chatlist');if(!el)return;
+  el.innerHTML=state.chat.map((m,i)=>m.who==='me'
+   ?`<div class="msg me">${esc(m.text)}</div>`
+   :`<div class="msg bot"><span class="botav sm">${ic('chat')}</span><div class="mb">${esc(m.text)}${(m.acts||[]).map((a,j)=>`<button class="btn hi" data-act="chatgo" data-i="${i}" data-j="${j}">${esc(a.label)} →</button>`).join('')}<button class="say" data-act="say" data-v="${esc(m.text)}" aria-label="${esc(t('read'))}">${ic('speaker')}</button></div></div>`).join('')
+   +(state.typing?`<div class="msg bot"><span class="botav sm">${ic('chat')}</span><div class="mb typing"><i></i><i></i><i></i></div></div>`:'');
+  el.lastElementChild&&el.lastElementChild.scrollIntoView({block:'nearest'});
+}
+function sendChat(text,voice,key){
+  text=text.trim();if(!text)return;
+  state.chat.push({who:'me',text});state.typing=true;drawChat();
+  setTimeout(()=>{
+    const r=key?intentReply(key):botReply(text);
+    state.chat.push({who:'bot',...r});state.typing=false;drawChat();
+    if(voice)speak(r.text);
+  },550);
+}
+function chipSend(key,label){sendChat(label,false,key)}
+
+/* ---------- calling (demo: replace with WebRTC plus a number-masking phone service) ---------- */
+function startCall(w){
+  if(!w)return;
+  state.call={w,sec:0,on:false};drawLayer();
+  state.call.t1=setTimeout(()=>{if(state.call){state.call.on=true;drawLayer()}},1800);
+  state.call.t2=setInterval(()=>{if(state.call&&state.call.on){state.call.sec++;const el=$('#tm');if(el)el.textContent=fmt(state.call.sec)}},1000);
+}
+function endCall(){if(state.call){clearTimeout(state.call.t1);clearInterval(state.call.t2);state.call=null;drawLayer()}}
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+
+function drawLayer(){
+  const L=$('#layer');
+  if(state.call){const w=state.call.w;
+    L.innerHTML=`<div class="overlay"><div class="sheet" role="dialog" aria-label="${esc(t('call_app'))}"><div class="big">${cicon(w.cat)}</div><h3>${esc(w.name)}</h3>
+     <p class="sub">${esc(cname(w.cat))}</p><p class="timer" id="tm">${state.call.on?fmt(state.call.sec):'…'}</p>
+     <p>${esc(state.call.on?t('connected'):t('calling'))}</p><p class="note">🔒 ${esc(t('hidden'))}<br>${esc(t('demo'))}</p>
+     <div class="row"><button class="btn" style="background:var(--danger);color:#fff" data-act="endcall">${ic('phoneoff')} ${esc(t('end'))}</button></div></div></div>`;
+  }else if(state.modal&&state.modal.type==='apply'){const j=state.jobs.find(x=>x.id===state.modal.id);
+    L.innerHTML=`<div class="overlay"><div class="sheet" role="dialog"><div class="big">${cicon(j.cat)}</div><h3>${esc(j.title)}</h3><p class="sub">₹${esc(j.pay)} ${esc(t('per_day'))} · ${esc(j.loc)}</p>
+     <label class="check" style="text-align:left"><input type="checkbox" id="ok18"><span>${esc(t('age18'))}</span></label>
+     <div class="row"><button class="btn ghost" data-act="cancel">${esc(t('cancel'))}</button><button class="btn" id="okbtn" data-act="applyok" disabled>${esc(t('confirm'))}</button></div></div></div>`;
+  }else L.innerHTML='';
+}
+
+/* ---------- accounts, OTP login and sessions ----------
+   Prototype only: accounts live in this browser and the OTP is shown on screen.
+   A live app creates accounts on a server and sends the OTP by SMS (MSG91, Twilio, etc.). */
+const phoneOk=p=>/^[6-9]\d{9}$/.test(p);
+function resetAuth(mode){state.auth={step:mode==='register'?'role':'phone',mode,role:'',phone:'',code:'',exp:0,sent:0,tries:0,prof:{}}}
+function startOtp(){
+  const a=state.auth;
+  a.code=String(crypto.getRandomValues(new Uint32Array(1))[0]%900000+100000);
+  a.sent=Date.now();a.exp=a.sent+5*60000;a.tries=0;
+}
+function captureReg(){
+  const a=state.auth;if(!a||state.view!=='register'||a.step!=='form')return;
+  const g=id=>{const e=$('#'+id);return e?e.value:''};
+  Object.assign(a.prof,{name:g('r_name'),phone:g('r_phone'),area:g('r_area'),skill:g('r_skill')||a.prof.skill,exp:g('r_exp'),biz:g('r_biz'),etype:g('r_etype')||a.prof.etype});
+}
+const phoneField=(id,val)=>`<div class="phonef"><span class="cc glass">+91</span><input type="text" id="${id}" inputmode="tel" maxlength="10" autocomplete="tel-national" value="${esc(val||'')}"></div>`;
+function otpBlock(){
+  const a=state.auth,secs=Math.max(0,30-Math.floor((Date.now()-a.sent)/1000));
+  return `<form id="of" novalidate><p class="sub" style="margin-bottom:14px">${esc(t('otp_sent',{p:a.phone}))}</p>
+  <div class="f"><label class="l" for="o_code">${esc(t('enter_otp'))}</label><input id="o_code" class="glass otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
+  <p class="note">${ic('lock')} ${esc(t('otp_demo',{c:a.code}))}</p>
+  <button class="btn hi" style="width:100%;margin-top:16px" type="submit">${ic('check')} ${esc(t('verify'))}</button>
+  <div class="row"><button class="btn ghost" type="button" data-act="authback">${ic('back')} ${esc(t('back'))}</button>
+  <button class="btn ghost" type="button" id="rs" data-act="resend" ${secs?'disabled':''}>${esc(secs?t('resend_in',{s:secs}):t('resend'))}</button></div></form>`;
+}
+V.login=()=>{
+  const a=state.auth;
+  return `<h1 class="hello">${esc(t('login'))}</h1>`+(a.step==='otp'?otpBlock():
+  `<form id="lf" novalidate><div class="f"><label class="l" for="l_phone">${esc(t('phone'))}</label>${phoneField('l_phone',a.phone)}</div>
+   <button class="btn hi" style="width:100%" type="submit">${esc(t('send_otp'))}</button></form>
+   <div class="row"><button class="btn ghost" data-act="open" data-v="register">${esc(t('new_here'))}</button></div>`);
+};
+V.register=()=>{
+  const a=state.auth,p=a.prof,w=a.role==='worker';
+  if(a.step==='otp')return `<h1 class="hello">${esc(t('create'))}</h1>`+otpBlock();
+  if(a.step==='role')return `<h1 class="hello">${esc(t('create'))}</h1><h2>${esc(t('who'))}</h2>
+   <div class="tiles"><button class="tile t1" data-act="role" data-v="worker"><span class="ic">${ic('tool')}</span>${esc(t('worker_role'))}<small>${esc(t('i_work'))}</small></button>
+   <button class="tile t2" data-act="role" data-v="employer"><span class="ic">${ic('building')}</span>${esc(t('employer_role'))}<small>${esc(t('i_hire'))}</small></button></div>
+   <div class="row"><button class="btn ghost" data-act="open" data-v="login">${esc(t('have_acct'))}</button></div>`;
+  return `<h1 class="hello">${esc(t(w?'worker_role':'employer_role'))}</h1><form id="rf" novalidate>
+   <div class="f"><label class="l" for="r_name">${esc(t('full_name'))}</label><input type="text" id="r_name" autocomplete="name" value="${esc(p.name||'')}"></div>
+   ${w?'':`<div class="f"><label class="l" for="r_biz">${esc(t('biz'))}</label><input type="text" id="r_biz" value="${esc(p.biz||'')}"></div>
+   <div class="f"><label class="l" for="r_etype">${esc(t('etype'))}</label><select id="r_etype"><option value="indiv" ${p.etype==='company'?'':'selected'}>${esc(t('indiv'))}</option><option value="company" ${p.etype==='company'?'selected':''}>${esc(t('company'))}</option></select></div>`}
+   <div class="f"><label class="l" for="r_phone">${esc(t('phone'))}</label>${phoneField('r_phone',p.phone)}</div>
+   ${w?`<div class="f"><label class="l" for="r_skill">${esc(t('skill'))}</label><select id="r_skill">${CATS.map(c=>`<option value="${c.id}" ${p.skill===c.id?'selected':''}>${c.ic} ${esc(cname(c.id))}</option>`).join('')}</select></div>
+   <div class="f"><label class="l" for="r_exp">${esc(t('exp'))}</label><input type="number" id="r_exp" inputmode="numeric" min="0" max="60" value="${esc(p.exp||'')}"></div>`:''}
+   <div class="f"><label class="l" for="r_area">${esc(t('area'))}</label><input type="text" id="r_area" autocomplete="address-level2" value="${esc(p.area||'')}"></div>
+   ${w?`<div class="f"><label class="check"><input type="checkbox" id="r_age"><span>${esc(t('age18'))}</span></label></div>`:''}
+   <div class="f"><label class="check"><input type="checkbox" id="r_agree"><span>${esc(t('agree'))}<br><a href="#" data-act="goto" data-v="rules">${ic('scale')} ${esc(t('rules'))}</a></span></label></div>
+   <button class="btn hi" style="width:100%" type="submit">${esc(t('send_otp'))}</button></form>
+   <div class="row"><button class="btn ghost" data-act="authback">${ic('back')} ${esc(t('back'))}</button></div>`;
+};
+function authSubmit(fid){
+  const a=state.auth,v=id=>{const e=$('#'+id);return e?e.value.trim():''};
+  if(fid==='lf'){
+    const p=v('l_phone');
+    if(!phoneOk(p))return toast(t('bad_phone'));
+    if(!state.users.some(u=>u.phone===p))return toast(t('no_acct'));
+    a.phone=p;startOtp();a.step='otp';render();
+  }else if(fid==='rf'){
+    const p=v('r_phone'),name=v('r_name'),area=v('r_area'),w=a.role==='worker';
+    if(!name)return toast(t('err_name'));
+    if(!phoneOk(p))return toast(t('bad_phone'));
+    if(!area)return toast(t('err_area'));
+    if(state.users.some(u=>u.phone===p))return toast(t('has_acct'));
+    if(w&&!$('#r_age').checked)return toast(t('err_age'));
+    if(!$('#r_agree').checked)return toast(t('err_agree'));
+    a.prof=w?{role:'worker',name,phone:p,area,skill:v('r_skill'),exp:+v('r_exp')||0}
+            :{role:'employer',name,phone:p,area,biz:v('r_biz')||name,etype:v('r_etype')};
+    a.phone=p;startOtp();a.step='otp';render();
+  }else if(fid==='of'){
+    if(Date.now()>a.exp)return toast(t('otp_exp'));
+    a.tries++;
+    if(v('o_code')!==a.code){if(a.tries>=5)a.exp=0;return toast(t('bad_otp'))}
+    let u;
+    if(a.mode==='register'){u={...a.prof,created:Date.now()};state.users.push(u);store.set('users',state.users)}
+    else u=state.users.find(x=>x.phone===a.phone);
+    state.user=u;store.set('session',u.phone);state.view='home';state.chat=[];state.cat='';state.q='';
+    render();toast(a.mode==='register'?t('acct_ok'):t('hello',{n:u.name}));
+  }
+}
+setInterval(()=>{const b=$('#rs');if(!b||!state.auth)return;const s=Math.max(0,30-Math.floor((Date.now()-state.auth.sent)/1000));b.disabled=s>0;b.textContent=s?t('resend_in',{s}):t('resend')},1000);
+
+/* ---------- landing page (shown before login) ---------- */
+V.landing=()=>`<section class="hero"><div class="pills"><span class="pill">${ic('shield')}${esc(t('verified'))}</span><span class="pill">${ic('lock')}OTP</span></div>
+ <h1>${esc(t('l_h'))}</h1><p>${esc(t('l_p'))}</p>
+ <div class="cta"><button class="btn hi" data-act="open" data-v="register">${esc(t('register'))}</button><button class="btn ghost" data-act="open" data-v="login">${esc(t('login'))}</button></div></section>
+<div class="pills" style="margin-top:22px">${CATS.map(c=>`<span class="pill">${c.ic} ${esc(cname(c.id))}</span>`).join('')}</div>
+<h2>${esc(t('who'))}</h2>
+<div class="roles">
+ <article class="rolecard glass"><span class="ic">${ic('tool')}</span><h3>${esc(t('i_work'))}</h3>
+  <ul>${['w_b1','w_b2','w_b3'].map(k=>`<li>${ic('check')}<span>${esc(t(k))}</span></li>`).join('')}</ul>
+  <button class="btn hi" data-act="regrole" data-v="worker">${esc(t('register'))}</button></article>
+ <article class="rolecard glass"><span class="ic">${ic('building')}</span><h3>${esc(t('i_hire'))}</h3>
+  <ul>${['e_b1','e_b2','e_b3'].map(k=>`<li>${ic('check')}<span>${esc(t(k))}</span></li>`).join('')}</ul>
+  <button class="btn" data-act="regrole" data-v="employer">${esc(t('register'))}</button></article>
+</div>
+<h2>${esc(t('how'))}</h2>
+${['s1','s2','s3'].map((k,i)=>`<div class="rule"><span class="ic">${i+1}</span><div>${esc(t(k))}</div></div>`).join('')}
+<h2>${esc(t('safe_t'))}</h2>
+${[['shield','t1'],['check','t2'],['lock','t3'],['scale','t4']].map(([i,k])=>`<div class="rule"><span class="ic">${ic(i)}</span><div>${esc(t(k))}</div></div>`).join('')}`;
+
+/* ---------- profile ---------- */
+V.profile=()=>{
+  const u=state.user,w=u.role==='worker';
+  const row=(i,main,sub)=>`<div class="rule"><span class="ic">${ic(i)}</span><div>${main}<p class="sub">${esc(sub)}</p></div></div>`;
+  return `<div class="chathead"><span class="botav" style="width:64px;height:64px;font-size:28px;font-weight:800">${esc(u.name.trim()[0].toUpperCase())}</span>
+  <div><h1 class="hello" style="margin:0">${esc(u.name)}</h1><span class="pill" style="margin-top:6px">${esc(t(w?'role_w':'role_e'))}</span></div></div>
+  ${row('phone','+91 '+esc(u.phone),t('phone'))}${row('pin',esc(u.area),t('area'))}
+  ${w?row('tool',`${cicon(u.skill)} ${esc(cname(u.skill))} · ${esc(u.exp)} yr`,t('skill')):row('building',esc(u.biz),t('biz'))}
+  <p class="note">${ic('lock')} ${esc(t('hidden'))}</p>
+  <div class="row"><button class="btn ghost" data-act="logout">${ic('logout')} ${esc(t('logout'))}</button></div>`;
+};
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const a=b.dataset.act,v=b.dataset.v;
+  if(a==='open'||a==='tab'){e.preventDefault();captureReg();if(v==='login'||v==='register')resetAuth(v);state.view=v;if(a==='tab')state.cat='';render();window.scrollTo(0,0)}
+  else if(a==='mode'){state.mode=v;render()}
+  else if(a==='cat'){state.cat=v;render()}
+  else if(a==='catgo'){state.view='find';state.mode='worker';state.cat=v;state.q='';render()}
+  else if(a==='say')speak(v);
+  else if(a==='mic')listen(b,txt=>{state.q=txt;const i=$('#q');if(i)i.value=txt;const mc=matchCat(txt);if(mc)state.cat='';render()});
+  else if(a==='cmic')listen(b,txt=>sendChat(txt,true));
+  else if(a==='csend'){const i=$('#ci');sendChat(i.value,false);i.value=''}
+  else if(a==='chatgo'){const ac=state.chat[+b.dataset.i].acts[+b.dataset.j];state.view=ac.v;if(ac.m)state.mode=ac.m;state.cat=ac.cat||'';state.q='';render()}
+  else if(a==='chip')chipSend(v,b.dataset.l)
+  else if(a==='call')startCall(WORKERS.find(x=>x.id===+v));
+  else if(a==='endcall')endCall();
+  else if(a==='apply'){state.modal={type:'apply',id:+v};drawLayer()}
+  else if(a==='cancel'){state.modal=null;drawLayer()}
+  else if(a==='applyok'){
+    const j=state.jobs.find(x=>x.id===state.modal.id),u=state.user;
+    if(j&&u&&u.role==='worker'&&!state.apps.some(x=>x.jobId===j.id&&x.wphone===u.phone)){
+      state.apps.push({id:Date.now(),jobId:j.id,wphone:u.phone,wname:u.name,wcat:u.skill,status:'applied',sample:false});
+      store.set('apps2',state.apps);addNotif(t('applied_for')+' '+j.title);
+      if(j.owner)addNotif(t('new_applicant')+' '+j.title+': '+u.name,j.owner);
+    }
+    state.modal=null;drawLayer();fillResults();toast(t('applied'));
+  }
+  else if(a==='hmic')listen(b,txt=>{state.q=txt;state.cat='';state.view='find';render();window.scrollTo(0,0)});
+  else if(a==='goto'){e.preventDefault();captureReg();state.prev=state.view;state.view=v;render();window.scrollTo(0,0)}
+  else if(a==='regrole'){resetAuth('register');state.auth.role=v;state.auth.step='form';state.view='register';render();window.scrollTo(0,0)}
+  else if(a==='role'){state.auth.role=v;state.auth.step='form';render()}
+  else if(a==='authback'){const x=state.auth;captureReg();if(x.step==='otp')x.step=x.mode==='register'?'form':'phone';else if(x.step==='form')x.step='role';render()}
+  else if(a==='resend'){startOtp();render()}
+  else if(a==='logout'){store.set('session','');state.user=null;state.view='landing';state.chat=[];state.cat='';state.q='';render();window.scrollTo(0,0);toast(t('logged_out'))}
+  else if(a==='decide'){const ap=state.apps.find(x=>x.id===+b.dataset.i);if(ap){ap.status=v;store.set('apps2',state.apps);const j=state.jobs.find(x=>x.id===ap.jobId);if(j&&!ap.sample)addNotif(t(v==='accepted'?'job_accepted':'job_rejected')+' '+j.title,ap.wphone);render()}}
+  else if(a==='callapp'){const ap=state.apps.find(x=>x.id===+v);if(ap)startCall({name:ap.wname,cat:ap.wcat})}
+  else if(a==='closejob'){const j=state.jobs.find(x=>x.id===+v);if(j){j.closed=1;store.set('jobs',state.jobs);render()}}
+  else if(a==='push'){try{Notification.requestPermission().then(render)}catch(err){}}
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='q'){state.q=e.target.value;fillResults()}
+  if(['r_phone','l_phone','o_code'].includes(e.target.id))e.target.value=e.target.value.replace(/\D/g,'').slice(0,e.target.id==='o_code'?6:10);
+  if(e.target.id==='ok18'){$('#okbtn').disabled=!e.target.checked}
+  if(e.target.name==='veh'){$('#dvbox').hidden=e.target.value!=='1'}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='ci'){e.preventDefault();sendChat(e.target.value,false);e.target.value=''}});
+document.addEventListener('submit',e=>{
+  const fid=e.target.id;
+  if(fid==='hf'){e.preventDefault();state.q=($('#hq').value||'').trim();state.cat='';state.view='find';render();window.scrollTo(0,0);return}
+  if(fid==='rf'||fid==='lf'||fid==='of'){e.preventDefault();return authSubmit(fid)}
+  if(fid!=='pf')return;e.preventDefault();
+  if(!state.user||state.user.role!=='employer')return;
+  const g=id=>$('#'+id).value.trim();
+  const veh=document.querySelector('input[name=veh]:checked').value==='1';
+  const title=g('f_title'),loc=g('f_loc'),pay=+g('f_pay');
+  if(!title||!loc||!pay)return toast(t('err_fill'));
+  if(veh&&!$('#f_dv').checked)return toast(t('err_driver'));
+  if(!$('#f_agree').checked)return toast(t('err_agree'));
+  const job={id:Date.now(),title,cat:g('f_cat'),type:g('f_type'),pay,veh:veh?1:0,dv:veh?1:0,
+    drink:+document.querySelector('input[name=drk]:checked').value,loc,need:+g('f_need')||1,emp:state.user.biz||state.user.name,owner:state.user.phone};
+  state.jobs.unshift(job);store.set('jobs',state.jobs);
+  const pool=WORKERS.filter(w=>w.cat===job.cat).slice(0,2);
+  pool.forEach((w,i)=>state.apps.push({id:Date.now()+i+1,jobId:job.id,wphone:'sample-'+w.id,wname:w.name,wcat:w.cat,status:'applied',sample:true}));
+  store.set('apps2',state.apps);
+  addNotif(t('posted'));if(pool.length)addNotif(t('new_applicant')+' '+title+': '+pool[0].name);
+  toast(t('posted'));state.view='myjobs';state.cat='';state.q='';render();window.scrollTo(0,0);
+});
+
+document.addEventListener('change',e=>{if(e.target.id==='lang'){captureReg();state.lang=e.target.value;store.set('lang',state.lang);state.chat=[];render()}});
+state.user=state.users.find(u=>u.phone===store.get('session',''))||null;
+state.view=state.user?'home':'landing';
+resetAuth('login');
+render();
+</script>
+</body>
+</html>

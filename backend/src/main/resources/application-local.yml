@@ -1,0 +1,12 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: ${DATABASE_URL:jdbc:h2:file:./data/kaam-connect;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${DATABASE_USER:sa}
+    password: ${DATABASE_PASSWORD:}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:local-only-signing-key-do-not-use-in-production}
